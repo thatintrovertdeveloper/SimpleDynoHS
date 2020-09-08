@@ -118,7 +118,7 @@ Public MustInherit Class SimpleDynoSubForm
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow
         Me.SetStyle(ControlStyles.AllPaintingInWmPaint Or ControlStyles.UserPaint, True)
         Me.DoubleBuffered = True
-        Me.TopMost = True
+        Me.TopMost = False
 
         myNumber = WhichNumberAmI
         CopyOfData = SentData
