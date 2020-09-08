@@ -1,0 +1,4 @@
+*.pdf
+Thumbs.db
+bin/*
+obj/*
