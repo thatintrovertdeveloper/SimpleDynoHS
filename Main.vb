@@ -1207,8 +1207,7 @@ Public Class Main
                 With btnStartPowerRun
                     .BackColor = System.Windows.Forms.Control.DefaultBackColor
                 End With
-                StopFitting = True
-                WhichDataMode = LIVE
+                WhichDataMode = LIVE 'This will tell Fit.vb that poer run has ended and it is time to fit
             Else
                 btnHide_Click(Me, EventArgs.Empty)
                 With SaveFileDialog1
@@ -1228,7 +1227,7 @@ Public Class Main
                     End With
                     WhichDataMode = POWERRUN
                     StopFitting = False
-                    frmFit.ProcessData()
+                    frmFit.ProcessData() 'Put Fit.vb in mode where it waits for data until WhichDataMode changes
                 Else
                     btnShow_Click(Me, EventArgs.Empty)
                 End If
@@ -1364,7 +1363,6 @@ Public Class Main
                 With btnStartLoggingRaw
                     .BackColor = System.Windows.Forms.Control.DefaultBackColor
                 End With
-                'StopFitting = True
                 WhichDataMode = LIVE
             Else
                 btnHide_Click(Me, EventArgs.Empty)
@@ -1427,7 +1425,7 @@ Public Class Main
         Next
     End Sub
     Private Sub txtControl_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs)
-        If e.KeyChar <> ""c Then
+        If e.KeyChar <> 8 Then 'If not backspace
             If AllowedCharacters.IndexOf(e.KeyChar) = -1 Then
                 e.Handled = True
             End If
@@ -2526,6 +2524,7 @@ Public Class Main
                     End If
                 End If
 
+                ' Automatically stop powerrun once RPM1 falls low again
                 If WhichDataMode = POWERRUN AndAlso DataPoints > MinimumPowerRunPoints AndAlso Data(RPM1_ROLLER, ACTUAL) <= ActualPowerRunThreshold Then
                     SetControlBackColor_ThreadSafe(btnStartPowerRun, System.Windows.Forms.Control.DefaultBackColor)
                     'DataPoints -= 1

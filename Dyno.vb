@@ -1,4 +1,4 @@
-﻿Public Class Dyno
+Public Class Dyno
     'Dyno Parameters
     Friend CarMass As Double
     Friend AxleMass As Double
