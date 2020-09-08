@@ -1425,7 +1425,7 @@ Public Class Main
         Next
     End Sub
     Private Sub txtControl_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs)
-        If e.KeyChar <> 8 Then 'If not backspace
+        If Asc(e.KeyChar) <> 8 Then 'If not backspace
             If AllowedCharacters.IndexOf(e.KeyChar) = -1 Then
                 e.Handled = True
             End If
