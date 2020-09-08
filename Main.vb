@@ -148,6 +148,12 @@ Public Class Main
     Private Const MAXIMUM As Integer = 2
     Private Const MINCURMAXPOINTER As Integer = 3
     Friend WithEvents Button1 As System.Windows.Forms.Button
+    Friend WithEvents SessionTextBox As System.Windows.Forms.TextBox
+    Friend WithEvents SessionLabel As System.Windows.Forms.Label
+    Friend WithEvents PostfixLabel As System.Windows.Forms.Label
+    Friend WithEvents txtPowerrunDir As System.Windows.Forms.TextBox
+    Friend WithEvents PowerrunDirLabel As System.Windows.Forms.Label
+    Friend WithEvents SetDirButton As System.Windows.Forms.Button
 
 #End Region
 #Region "SimpleDyno Function Declarations"
@@ -458,6 +464,7 @@ Public Class Main
     Friend WithEvents btnResetMaxima As System.Windows.Forms.Button
     Public WithEvents btnStartPowerRun As System.Windows.Forms.Button
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
+    Friend WithEvents SelectFolderDialog As System.Windows.Forms.FolderBrowserDialog
     Friend WithEvents txtZeroTimeDetect As System.Windows.Forms.TextBox
     Friend WithEvents lblZeroDetect As System.Windows.Forms.Label
     Friend WithEvents pnlSignalWindow As SimpleDyno.DoubleBufferPanel
@@ -490,6 +497,7 @@ Public Class Main
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main))
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
+        Me.SelectFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
         Me.btnStartLoggingRaw = New System.Windows.Forms.Button()
         Me.btnResetMaxima = New System.Windows.Forms.Button()
         Me.btnStartPowerRun = New System.Windows.Forms.Button()
@@ -525,7 +533,13 @@ Public Class Main
         Me.cmbBufferSize = New System.Windows.Forms.ComboBox()
         Me.btnPerformanceTest = New System.Windows.Forms.Button()
         Me.Button1 = New System.Windows.Forms.Button()
+        Me.SessionTextBox = New System.Windows.Forms.TextBox()
+        Me.SessionLabel = New System.Windows.Forms.Label()
+        Me.PostfixLabel = New System.Windows.Forms.Label()
         Me.pnlSignalWindow = New SimpleDyno.DoubleBufferPanel()
+        Me.txtPowerrunDir = New System.Windows.Forms.TextBox()
+        Me.PowerrunDirLabel = New System.Windows.Forms.Label()
+        Me.SetDirButton = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'SaveFileDialog1
@@ -594,7 +608,7 @@ Public Class Main
         Me.txtThreshold2.CausesValidation = False
         Me.txtThreshold2.Enabled = False
         Me.txtThreshold2.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtThreshold2.Location = New System.Drawing.Point(396, 68)
+        Me.txtThreshold2.Location = New System.Drawing.Point(429, 67)
         Me.txtThreshold2.Name = "txtThreshold2"
         Me.txtThreshold2.Size = New System.Drawing.Size(23, 21)
         Me.txtThreshold2.TabIndex = 169
@@ -608,7 +622,7 @@ Public Class Main
         Me.txtThreshold1.CausesValidation = False
         Me.txtThreshold1.Enabled = False
         Me.txtThreshold1.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtThreshold1.Location = New System.Drawing.Point(367, 67)
+        Me.txtThreshold1.Location = New System.Drawing.Point(400, 67)
         Me.txtThreshold1.Name = "txtThreshold1"
         Me.txtThreshold1.Size = New System.Drawing.Size(23, 21)
         Me.txtThreshold1.TabIndex = 168
@@ -686,7 +700,7 @@ Public Class Main
         '
         Me.Label17.AutoSize = True
         Me.Label17.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label17.Location = New System.Drawing.Point(274, 27)
+        Me.Label17.Location = New System.Drawing.Point(344, 27)
         Me.Label17.Name = "Label17"
         Me.Label17.Size = New System.Drawing.Size(66, 13)
         Me.Label17.TabIndex = 58
@@ -729,7 +743,7 @@ Public Class Main
         '
         Me.txtPowerRunThreshold.CausesValidation = False
         Me.txtPowerRunThreshold.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtPowerRunThreshold.Location = New System.Drawing.Point(342, 24)
+        Me.txtPowerRunThreshold.Location = New System.Drawing.Point(412, 24)
         Me.txtPowerRunThreshold.Name = "txtPowerRunThreshold"
         Me.txtPowerRunThreshold.Size = New System.Drawing.Size(67, 21)
         Me.txtPowerRunThreshold.TabIndex = 44
@@ -741,7 +755,7 @@ Public Class Main
         '
         Me.txtZeroTimeDetect.CausesValidation = False
         Me.txtZeroTimeDetect.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtZeroTimeDetect.Location = New System.Drawing.Point(492, 68)
+        Me.txtZeroTimeDetect.Location = New System.Drawing.Point(553, 68)
         Me.txtZeroTimeDetect.Name = "txtZeroTimeDetect"
         Me.txtZeroTimeDetect.Size = New System.Drawing.Size(38, 21)
         Me.txtZeroTimeDetect.TabIndex = 51
@@ -753,7 +767,7 @@ Public Class Main
         '
         Me.lblZeroDetect.AutoSize = True
         Me.lblZeroDetect.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblZeroDetect.Location = New System.Drawing.Point(426, 72)
+        Me.lblZeroDetect.Location = New System.Drawing.Point(487, 72)
         Me.lblZeroDetect.Name = "lblZeroDetect"
         Me.lblZeroDetect.Size = New System.Drawing.Size(64, 13)
         Me.lblZeroDetect.TabIndex = 32
@@ -762,7 +776,7 @@ Public Class Main
         '
         'btnStartAcquisition
         '
-        Me.btnStartAcquisition.Location = New System.Drawing.Point(425, 90)
+        Me.btnStartAcquisition.Location = New System.Drawing.Point(486, 90)
         Me.btnStartAcquisition.Name = "btnStartAcquisition"
         Me.btnStartAcquisition.Size = New System.Drawing.Size(105, 21)
         Me.btnStartAcquisition.TabIndex = 163
@@ -772,7 +786,7 @@ Public Class Main
         'cmbAcquisition
         '
         Me.cmbAcquisition.FormattingEnabled = True
-        Me.cmbAcquisition.Location = New System.Drawing.Point(426, 2)
+        Me.cmbAcquisition.Location = New System.Drawing.Point(487, 2)
         Me.cmbAcquisition.Name = "cmbAcquisition"
         Me.cmbAcquisition.Size = New System.Drawing.Size(171, 21)
         Me.cmbAcquisition.TabIndex = 162
@@ -780,7 +794,7 @@ Public Class Main
         'cmbSampleRate
         '
         Me.cmbSampleRate.FormattingEnabled = True
-        Me.cmbSampleRate.Location = New System.Drawing.Point(508, 24)
+        Me.cmbSampleRate.Location = New System.Drawing.Point(569, 24)
         Me.cmbSampleRate.Name = "cmbSampleRate"
         Me.cmbSampleRate.Size = New System.Drawing.Size(89, 21)
         Me.cmbSampleRate.TabIndex = 161
@@ -788,7 +802,7 @@ Public Class Main
         'cmbChannels
         '
         Me.cmbChannels.FormattingEnabled = True
-        Me.cmbChannels.Location = New System.Drawing.Point(426, 24)
+        Me.cmbChannels.Location = New System.Drawing.Point(487, 24)
         Me.cmbChannels.Name = "cmbChannels"
         Me.cmbChannels.Size = New System.Drawing.Size(81, 21)
         Me.cmbChannels.TabIndex = 160
@@ -796,7 +810,7 @@ Public Class Main
         'cmbBaudRate
         '
         Me.cmbBaudRate.FormattingEnabled = True
-        Me.cmbBaudRate.Location = New System.Drawing.Point(531, 46)
+        Me.cmbBaudRate.Location = New System.Drawing.Point(592, 46)
         Me.cmbBaudRate.Name = "cmbBaudRate"
         Me.cmbBaudRate.Size = New System.Drawing.Size(66, 21)
         Me.cmbBaudRate.TabIndex = 159
@@ -805,7 +819,7 @@ Public Class Main
         '
         Me.cmbCOMPorts.DropDownWidth = 300
         Me.cmbCOMPorts.FormattingEnabled = True
-        Me.cmbCOMPorts.Location = New System.Drawing.Point(426, 46)
+        Me.cmbCOMPorts.Location = New System.Drawing.Point(487, 46)
         Me.cmbCOMPorts.Name = "cmbCOMPorts"
         Me.cmbCOMPorts.Size = New System.Drawing.Size(104, 21)
         Me.cmbCOMPorts.TabIndex = 158
@@ -813,7 +827,7 @@ Public Class Main
         'lblCOMActive
         '
         Me.lblCOMActive.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.lblCOMActive.Location = New System.Drawing.Point(531, 91)
+        Me.lblCOMActive.Location = New System.Drawing.Point(592, 91)
         Me.lblCOMActive.Name = "lblCOMActive"
         Me.lblCOMActive.Size = New System.Drawing.Size(66, 19)
         Me.lblCOMActive.TabIndex = 157
@@ -851,7 +865,7 @@ Public Class Main
         'chkAdvancedProcessing
         '
         Me.chkAdvancedProcessing.AutoSize = True
-        Me.chkAdvancedProcessing.Location = New System.Drawing.Point(531, 71)
+        Me.chkAdvancedProcessing.Location = New System.Drawing.Point(592, 71)
         Me.chkAdvancedProcessing.Name = "chkAdvancedProcessing"
         Me.chkAdvancedProcessing.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.chkAdvancedProcessing.Size = New System.Drawing.Size(45, 17)
@@ -889,22 +903,86 @@ Public Class Main
         Me.Button1.TabIndex = 185
         Me.Button1.Text = "Correction"
         '
+        'SessionTextBox
+        '
+        Me.SessionTextBox.Location = New System.Drawing.Point(155, 23)
+        Me.SessionTextBox.Name = "SessionTextBox"
+        Me.SessionTextBox.Size = New System.Drawing.Size(119, 21)
+        Me.SessionTextBox.TabIndex = 186
+        '
+        'SessionLabel
+        '
+        Me.SessionLabel.AutoSize = True
+        Me.SessionLabel.Location = New System.Drawing.Point(77, 27)
+        Me.SessionLabel.Name = "SessionLabel"
+        Me.SessionLabel.Size = New System.Drawing.Size(72, 13)
+        Me.SessionLabel.TabIndex = 187
+        Me.SessionLabel.Text = "Session name"
+        '
+        'PostfixLabel
+        '
+        Me.PostfixLabel.AutoSize = True
+        Me.PostfixLabel.Location = New System.Drawing.Point(281, 29)
+        Me.PostfixLabel.Name = "PostfixLabel"
+        Me.PostfixLabel.Size = New System.Drawing.Size(0, 13)
+        Me.PostfixLabel.TabIndex = 188
+        '
         'pnlSignalWindow
         '
         Me.pnlSignalWindow.BackColor = System.Drawing.SystemColors.Control
         Me.pnlSignalWindow.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
         Me.pnlSignalWindow.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.pnlSignalWindow.Location = New System.Drawing.Point(599, 2)
+        Me.pnlSignalWindow.Location = New System.Drawing.Point(660, 2)
         Me.pnlSignalWindow.Name = "pnlSignalWindow"
         Me.pnlSignalWindow.Size = New System.Drawing.Size(25, 108)
         Me.pnlSignalWindow.TabIndex = 33
+        '
+        'txtPowerrunDir
+        '
+        Me.txtPowerrunDir.CausesValidation = False
+        Me.txtPowerrunDir.Enabled = False
+        Me.txtPowerrunDir.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtPowerrunDir.Location = New System.Drawing.Point(371, 68)
+        Me.txtPowerrunDir.Name = "txtPowerrunDir"
+        Me.txtPowerrunDir.Size = New System.Drawing.Size(23, 21)
+        Me.txtPowerrunDir.TabIndex = 189
+        Me.txtPowerrunDir.Tag = ""
+        Me.txtPowerrunDir.Text = "C:\SimpleDyno\DefaultView.sdi"
+        Me.txtPowerrunDir.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.txtPowerrunDir.Visible = False
+        '
+        'PowerrunDirLabel
+        '
+        Me.PowerrunDirLabel.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.PowerrunDirLabel.Location = New System.Drawing.Point(247, 54)
+        Me.PowerrunDirLabel.Name = "PowerrunDirLabel"
+        Me.PowerrunDirLabel.Size = New System.Drawing.Size(205, 13)
+        Me.PowerrunDirLabel.TabIndex = 190
+        Me.PowerrunDirLabel.Text = "Powerrun dir:"
+        Me.PowerrunDirLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'SetDirButton
+        '
+        Me.SetDirButton.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.SetDirButton.Location = New System.Drawing.Point(411, 1)
+        Me.SetDirButton.Name = "SetDirButton"
+        Me.SetDirButton.Size = New System.Drawing.Size(68, 21)
+        Me.SetDirButton.TabIndex = 191
+        Me.SetDirButton.Text = "Set dir"
+        Me.SetDirButton.UseVisualStyleBackColor = True
         '
         'Main
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 14)
         Me.AutoScroll = True
         Me.CausesValidation = False
-        Me.ClientSize = New System.Drawing.Size(626, 112)
+        Me.ClientSize = New System.Drawing.Size(687, 112)
+        Me.Controls.Add(Me.SetDirButton)
+        Me.Controls.Add(Me.PowerrunDirLabel)
+        Me.Controls.Add(Me.txtPowerrunDir)
+        Me.Controls.Add(Me.PostfixLabel)
+        Me.Controls.Add(Me.SessionLabel)
+        Me.Controls.Add(Me.SessionTextBox)
         Me.Controls.Add(Me.txtThreshold1)
         Me.Controls.Add(Me.pnlSignalWindow)
         Me.Controls.Add(Me.txtThreshold2)
@@ -1207,30 +1285,29 @@ Public Class Main
                 With btnStartPowerRun
                     .BackColor = System.Windows.Forms.Control.DefaultBackColor
                 End With
+
+                If DataPoints <= MinimumPowerRunPoints Then
+                    'Unable to proceed with fitting if not enough data
+                    StopFitting = True
+                End If
+
                 WhichDataMode = LIVE 'This will tell Fit.vb that poer run has ended and it is time to fit
             Else
                 btnHide_Click(Me, EventArgs.Empty)
-                With SaveFileDialog1
-                    .Reset()
-                    .Filter = "Power Run files (*.sdp)|*.sdp"
-                    .ShowDialog()
+
+                LogPowerRunDataFileName = txtPowerrunDir.Text & "\" & SessionTextBox.Text & PostfixLabel.Text
+                ResetValues()
+                DataPoints = 0
+                ' DataPoints2 = 0
+                btnStartLoggingRaw.Enabled = False
+                btnShow_Click(Me, EventArgs.Empty)
+                With btnStartPowerRun
+                    .BackColor = Color.Red
                 End With
-                If SaveFileDialog1.FileName <> "" Then
-                    LogPowerRunDataFileName = SaveFileDialog1.FileName
-                    ResetValues()
-                    DataPoints = 0
-                    ' DataPoints2 = 0
-                    btnStartLoggingRaw.Enabled = False
-                    btnShow_Click(Me, EventArgs.Empty)
-                    With btnStartPowerRun
-                        .BackColor = Color.Red
-                    End With
-                    WhichDataMode = POWERRUN
-                    StopFitting = False
-                    frmFit.ProcessData() 'Put Fit.vb in mode where it waits for data until WhichDataMode changes
-                Else
-                    btnShow_Click(Me, EventArgs.Empty)
-                End If
+                WhichDataMode = POWERRUN
+                StopFitting = False
+                frmFit.ProcessData() 'Put Fit.vb in mode where it waits for data until WhichDataMode changes
+
             End If
         Catch e1 As Exception
             btnHide_Click(Me, EventArgs.Empty)
@@ -1399,7 +1476,7 @@ Public Class Main
     'Assigns single sub to handle text box entries ensuring only allowed chars are entered
     Private Sub SetupTextBoxCharacterHandling()
         For Each c As Control In Me.Controls
-            If TypeOf c Is TextBox Then
+            If TypeOf c Is TextBox And Not (c Is SessionTextBox) Then
                 AddHandler c.KeyPress, AddressOf txtControl_KeyPress
             End If
         Next
@@ -1543,8 +1620,8 @@ Public Class Main
                                 End If
                             Next
                             btnStartAcquisition.Select()
-                        Case Is = "Enter Alternates Here" ' this section for interpreting older versions of the settings file if needed
-
+                        Case Else
+                            MsgBox("Wrong format in: " & SettingsDirectory & SettingsFile & " Settings not loaded!", MsgBoxStyle.Exclamation)
                     End Select
 
                 ElseIf File.Exists(SettingsDirectory & "\SimpleDynoSettings_6_3.sds") Then 'this is a one off for moving from 6.3 forward
@@ -1902,12 +1979,12 @@ Public Class Main
 
 
         DataTags(TEMPERATURE1) = "Temperature1"
-        DataUnitTags(TEMPERATURE1) = "°C"
+        DataUnitTags(TEMPERATURE1) = "Â°C"
         DataUnits(TEMPERATURE1, 0) = 1
         Data(TEMPERATURE1, MINIMUM) = 10000
 
         DataTags(TEMPERATURE2) = "Temperature2"
-        DataUnitTags(TEMPERATURE2) = "°C"
+        DataUnitTags(TEMPERATURE2) = "Â°C"
         DataUnits(TEMPERATURE2, 0) = 1
         Data(TEMPERATURE1, MINIMUM) = 10000
 
@@ -2378,95 +2455,95 @@ Public Class Main
                                     End If
                             End Select
                         End If
+                    End If
+                    If (WhichSignal = HIGHSIGNAL AndAlso RawWaveData(j) <= HighSignalThreshold - 3) Or (WhichSignal = LOWSIGNAL AndAlso RawWaveData(j) >= HighSignalThreshold + 3) Then
+                        If FoundHighSignal = True Then
+                            Data(CHAN1_PULSEWIDTH, ACTUAL) = k * BytesToSeconds * 1000
+                            If Data(CHAN1_PULSEWIDTH, ACTUAL) > Data(CHAN1_PULSEWIDTH, MAXIMUM) Then Data(CHAN1_PULSEWIDTH, MAXIMUM) = Data(CHAN1_PULSEWIDTH, ACTUAL)
+                            If Data(CHAN1_PULSEWIDTH, ACTUAL) < Data(CHAN1_PULSEWIDTH, MINIMUM) Then Data(CHAN1_PULSEWIDTH, MINIMUM) = Data(CHAN1_PULSEWIDTH, ACTUAL)
+                            k = 0
+                            Data(CHAN1_DUTYCYCLE, ACTUAL) = Data(CHAN1_PULSEWIDTH, ACTUAL) * Data(CHAN1_FREQUENCY, ACTUAL) / 10
+                            If Data(CHAN1_DUTYCYCLE, ACTUAL) > Data(CHAN1_DUTYCYCLE, MAXIMUM) Then Data(CHAN1_DUTYCYCLE, MAXIMUM) = Data(CHAN1_DUTYCYCLE, ACTUAL)
+                            If Data(CHAN1_DUTYCYCLE, ACTUAL) < Data(CHAN1_DUTYCYCLE, MINIMUM) Then Data(CHAN1_DUTYCYCLE, MINIMUM) = Data(CHAN1_DUTYCYCLE, ACTUAL)
                         End If
-                        If (WhichSignal = HIGHSIGNAL AndAlso RawWaveData(j) <= HighSignalThreshold - 3) Or (WhichSignal = LOWSIGNAL AndAlso RawWaveData(j) >= HighSignalThreshold + 3) Then
-                            If FoundHighSignal = True Then
-                                Data(CHAN1_PULSEWIDTH, ACTUAL) = k * BytesToSeconds * 1000
-                                If Data(CHAN1_PULSEWIDTH, ACTUAL) > Data(CHAN1_PULSEWIDTH, MAXIMUM) Then Data(CHAN1_PULSEWIDTH, MAXIMUM) = Data(CHAN1_PULSEWIDTH, ACTUAL)
-                                If Data(CHAN1_PULSEWIDTH, ACTUAL) < Data(CHAN1_PULSEWIDTH, MINIMUM) Then Data(CHAN1_PULSEWIDTH, MINIMUM) = Data(CHAN1_PULSEWIDTH, ACTUAL)
-                                k = 0
-                                Data(CHAN1_DUTYCYCLE, ACTUAL) = Data(CHAN1_PULSEWIDTH, ACTUAL) * Data(CHAN1_FREQUENCY, ACTUAL) / 10
-                                If Data(CHAN1_DUTYCYCLE, ACTUAL) > Data(CHAN1_DUTYCYCLE, MAXIMUM) Then Data(CHAN1_DUTYCYCLE, MAXIMUM) = Data(CHAN1_DUTYCYCLE, ACTUAL)
-                                If Data(CHAN1_DUTYCYCLE, ACTUAL) < Data(CHAN1_DUTYCYCLE, MINIMUM) Then Data(CHAN1_DUTYCYCLE, MINIMUM) = Data(CHAN1_DUTYCYCLE, ACTUAL)
-                            End If
-                            FoundHighSignal = False
-                        End If
+                        FoundHighSignal = False
+                    End If
 
-                        LastSignal = RawWaveData(j) 'remember the last high signal and the current correction time
+                    LastSignal = RawWaveData(j) 'remember the last high signal and the current correction time
 
-                        If NUMBER_OF_CHANNELS = 2 Then
+                    If NUMBER_OF_CHANNELS = 2 Then
 
-                            SignalWindowBMP.DrawLine(Channel2ThresholdPen, 0, SignalThreshold2YConverted, PicSignalWidth, SignalThreshold2YConverted)
-                            NextYPosition2 = CInt(PicSignalHeight - RawWaveData(j + 1) * SignalYConversion) + 1    'calculate coordinate for next channel 2 signal point
-                            SignalWindowBMP.DrawLine(Channel2SignalPen, CInt(CurrentSignalXPosition - SignalXConversion), LastYPosition2, CInt(CurrentSignalXPosition), NextYPosition2) 'draw line to the newly calculated point...
-                            LastYPosition2 = NextYPosition2 '...and remember the new position for the next cycle
+                        SignalWindowBMP.DrawLine(Channel2ThresholdPen, 0, SignalThreshold2YConverted, PicSignalWidth, SignalThreshold2YConverted)
+                        NextYPosition2 = CInt(PicSignalHeight - RawWaveData(j + 1) * SignalYConversion) + 1    'calculate coordinate for next channel 2 signal point
+                        SignalWindowBMP.DrawLine(Channel2SignalPen, CInt(CurrentSignalXPosition - SignalXConversion), LastYPosition2, CInt(CurrentSignalXPosition), NextYPosition2) 'draw line to the newly calculated point...
+                        LastYPosition2 = NextYPosition2 '...and remember the new position for the next cycle
 
-                            If (WhichSignal2 = HIGHSIGNAL AndAlso RawWaveData(j + 1) > HighSignalThreshold2) Or (WhichSignal2 = LOWSIGNAL AndAlso RawWaveData(j + 1) < HighSignalThreshold2) Then 'Check is we have found a signal depending on where the threshold line is set
+                        If (WhichSignal2 = HIGHSIGNAL AndAlso RawWaveData(j + 1) > HighSignalThreshold2) Or (WhichSignal2 = LOWSIGNAL AndAlso RawWaveData(j + 1) < HighSignalThreshold2) Then 'Check is we have found a signal depending on where the threshold line is set
 
-                                k2 = k2 + NUMBER_OF_CHANNELS 'count bytes for channel 2 pulsewidth
+                            k2 = k2 + NUMBER_OF_CHANNELS 'count bytes for channel 2 pulsewidth
 
-                                If FoundHighSignal2 = False Then    'if FoundHighSigal is false, then this is the start of a new pulse not the middle of an existing pulse
+                            If FoundHighSignal2 = False Then    'if FoundHighSigal is false, then this is the start of a new pulse not the middle of an existing pulse
 
-                                    FoundHighSignal2 = True 'flag that we are in the middle of a pulse
+                                FoundHighSignal2 = True 'flag that we are in the middle of a pulse
 
-                                    Select Case UseAdvancedProcessing 'Calculate elapsed time simply by the byte count since last or by interpolation through the threshold line
-                                        Case Is = False
-                                            ElapsedTime2 = (j + 1 - LastHighBufferPosition2) * BytesToSeconds 'calculate the elapsed time by multiplying the number of bytes since the last pulse 'by the time taken for each byte (which depends on the sampling rate)
-                                        Case Is = True
-                                            NewElapsedTimeCorrection2 = Math.Abs((RawWaveData(j + 1) - HighSignalThreshold) / (RawWaveData(j + 1) - LastSignal2))
-                                            ElapsedTime2 = ((j + 1 - LastHighBufferPosition2) + OldElapsedTimeCorrection2 - NewElapsedTimeCorrection2) * BytesToSeconds
-                                            OldElapsedTimeCorrection2 = NewElapsedTimeCorrection2
-                                    End Select
+                                Select Case UseAdvancedProcessing 'Calculate elapsed time simply by the byte count since last or by interpolation through the threshold line
+                                    Case Is = False
+                                        ElapsedTime2 = (j + 1 - LastHighBufferPosition2) * BytesToSeconds 'calculate the elapsed time by multiplying the number of bytes since the last pulse 'by the time taken for each byte (which depends on the sampling rate)
+                                    Case Is = True
+                                        NewElapsedTimeCorrection2 = Math.Abs((RawWaveData(j + 1) - HighSignalThreshold) / (RawWaveData(j + 1) - LastSignal2))
+                                        ElapsedTime2 = ((j + 1 - LastHighBufferPosition2) + OldElapsedTimeCorrection2 - NewElapsedTimeCorrection2) * BytesToSeconds
+                                        OldElapsedTimeCorrection2 = NewElapsedTimeCorrection2
+                                End Select
 
-                                    LastHighBufferPosition2 = j + 1   'set the current buffer position for the next pulse
+                                LastHighBufferPosition2 = j + 1   'set the current buffer position for the next pulse
 
-                                    Data(CHAN2_FREQUENCY, ACTUAL) = 1 / ElapsedTime2 'calculate frequency for scope work 
-                                    If Data(CHAN2_FREQUENCY, ACTUAL) > Data(CHAN2_FREQUENCY, MAXIMUM) Then Data(CHAN2_FREQUENCY, MAXIMUM) = Data(CHAN2_FREQUENCY, ACTUAL)
-                                    If Data(CHAN2_FREQUENCY, ACTUAL) < Data(CHAN2_FREQUENCY, MINIMUM) Then Data(CHAN2_FREQUENCY, MINIMUM) = Data(CHAN2_FREQUENCY, ACTUAL)
+                                Data(CHAN2_FREQUENCY, ACTUAL) = 1 / ElapsedTime2 'calculate frequency for scope work 
+                                If Data(CHAN2_FREQUENCY, ACTUAL) > Data(CHAN2_FREQUENCY, MAXIMUM) Then Data(CHAN2_FREQUENCY, MAXIMUM) = Data(CHAN2_FREQUENCY, ACTUAL)
+                                If Data(CHAN2_FREQUENCY, ACTUAL) < Data(CHAN2_FREQUENCY, MINIMUM) Then Data(CHAN2_FREQUENCY, MINIMUM) = Data(CHAN2_FREQUENCY, ACTUAL)
 
 
-                                    Data(RPM2, ACTUAL) = ElapsedTimeToRadPerSec2 / ElapsedTime2 'calculate roller angular velocity in Rad/s
-                                    Data(RPM2_RATIO, ACTUAL) = Data(RPM2, ACTUAL) / Data(RPM1_WHEEL, ACTUAL) 'calculate the ratios between RPM2 and RPM1 - wheel
+                                Data(RPM2, ACTUAL) = ElapsedTimeToRadPerSec2 / ElapsedTime2 'calculate roller angular velocity in Rad/s
+                                Data(RPM2_RATIO, ACTUAL) = Data(RPM2, ACTUAL) / Data(RPM1_WHEEL, ACTUAL) 'calculate the ratios between RPM2 and RPM1 - wheel
 
-                                    Data(RPM2_ROLLOUT, ACTUAL) = WheelCircumference / Data(RPM2_RATIO, ACTUAL) 'calculate Rollout (default unit is mm).  This assumes RPM2 is measuring motor RPM   'Rollout is the number of mm traveled for 1 rotation of the wheel
+                                Data(RPM2_ROLLOUT, ACTUAL) = WheelCircumference / Data(RPM2_RATIO, ACTUAL) 'calculate Rollout (default unit is mm).  This assumes RPM2 is measuring motor RPM   'Rollout is the number of mm traveled for 1 rotation of the wheel
 
-                                    If Data(RPM2, ACTUAL) > Data(RPM2, MAXIMUM) Then 'check and set maximum values for RPM2, Ratio and rollout
-                                        Data(RPM2, MAXIMUM) = Data(RPM2, ACTUAL)
-                                    End If
-                                    If Data(RPM2, ACTUAL) < Data(RPM2, MINIMUM) Then
-                                        Data(RPM2, MINIMUM) = Data(RPM2, ACTUAL)
-                                    End If
-                                    If Data(RPM2_RATIO, ACTUAL) > Data(RPM2_RATIO, MAXIMUM) Then
-                                        Data(RPM2_RATIO, MAXIMUM) = Data(RPM2_RATIO, ACTUAL)
-                                    End If
-                                    If Data(RPM2_RATIO, ACTUAL) < Data(RPM2_RATIO, MINIMUM) Then
-                                        Data(RPM2_RATIO, MINIMUM) = Data(RPM2_RATIO, ACTUAL)
-                                    End If
-                                    If Data(RPM2_ROLLOUT, ACTUAL) > Data(RPM2_ROLLOUT, MAXIMUM) Then
-                                        Data(RPM2_ROLLOUT, MAXIMUM) = Data(RPM2_ROLLOUT, ACTUAL)
-                                    End If
-                                    If Data(RPM2_ROLLOUT, ACTUAL) < Data(RPM2_ROLLOUT, MINIMUM) Then
-                                        Data(RPM2_ROLLOUT, MINIMUM) = Data(RPM2_ROLLOUT, ACTUAL)
-                                    End If
+                                If Data(RPM2, ACTUAL) > Data(RPM2, MAXIMUM) Then 'check and set maximum values for RPM2, Ratio and rollout
+                                    Data(RPM2, MAXIMUM) = Data(RPM2, ACTUAL)
+                                End If
+                                If Data(RPM2, ACTUAL) < Data(RPM2, MINIMUM) Then
+                                    Data(RPM2, MINIMUM) = Data(RPM2, ACTUAL)
+                                End If
+                                If Data(RPM2_RATIO, ACTUAL) > Data(RPM2_RATIO, MAXIMUM) Then
+                                    Data(RPM2_RATIO, MAXIMUM) = Data(RPM2_RATIO, ACTUAL)
+                                End If
+                                If Data(RPM2_RATIO, ACTUAL) < Data(RPM2_RATIO, MINIMUM) Then
+                                    Data(RPM2_RATIO, MINIMUM) = Data(RPM2_RATIO, ACTUAL)
+                                End If
+                                If Data(RPM2_ROLLOUT, ACTUAL) > Data(RPM2_ROLLOUT, MAXIMUM) Then
+                                    Data(RPM2_ROLLOUT, MAXIMUM) = Data(RPM2_ROLLOUT, ACTUAL)
+                                End If
+                                If Data(RPM2_ROLLOUT, ACTUAL) < Data(RPM2_ROLLOUT, MINIMUM) Then
+                                    Data(RPM2_ROLLOUT, MINIMUM) = Data(RPM2_ROLLOUT, ACTUAL)
                                 End If
                             End If
-                            If (WhichSignal2 = HIGHSIGNAL AndAlso RawWaveData(j + 1) <= HighSignalThreshold2 - 3) Or (WhichSignal2 = LOWSIGNAL AndAlso RawWaveData(j + 1) >= HighSignalThreshold2 + 3) Then
-                                If FoundHighSignal2 = True Then
-                                    Data(CHAN2_PULSEWIDTH, ACTUAL) = k2 * BytesToSeconds * 1000
-                                    k2 = 0
-                                    If Data(CHAN2_PULSEWIDTH, ACTUAL) > Data(CHAN2_PULSEWIDTH, MAXIMUM) Then Data(CHAN2_PULSEWIDTH, MAXIMUM) = Data(CHAN2_PULSEWIDTH, ACTUAL)
-                                    If Data(CHAN2_PULSEWIDTH, ACTUAL) < Data(CHAN2_PULSEWIDTH, MINIMUM) Then Data(CHAN2_PULSEWIDTH, MINIMUM) = Data(CHAN2_PULSEWIDTH, ACTUAL)
-                                    Data(CHAN2_DUTYCYCLE, ACTUAL) = Data(CHAN2_PULSEWIDTH, ACTUAL) * Data(CHAN2_FREQUENCY, ACTUAL) / 10
-                                    If Data(CHAN2_DUTYCYCLE, ACTUAL) > Data(CHAN2_DUTYCYCLE, MAXIMUM) Then Data(CHAN2_DUTYCYCLE, MAXIMUM) = Data(CHAN2_DUTYCYCLE, ACTUAL)
-                                    If Data(CHAN2_DUTYCYCLE, ACTUAL) < Data(CHAN2_DUTYCYCLE, MINIMUM) Then Data(CHAN2_DUTYCYCLE, MINIMUM) = Data(CHAN2_DUTYCYCLE, ACTUAL)
-                                End If
-
-                                FoundHighSignal2 = False
-
-                            End If
-                            LastSignal2 = RawWaveData(j + 1) 'remember the last high signal and the current correction time
                         End If
-                        CurrentSignalXPosition = (CurrentSignalXPosition + SignalXConversion) Mod PicSignalWidth
+                        If (WhichSignal2 = HIGHSIGNAL AndAlso RawWaveData(j + 1) <= HighSignalThreshold2 - 3) Or (WhichSignal2 = LOWSIGNAL AndAlso RawWaveData(j + 1) >= HighSignalThreshold2 + 3) Then
+                            If FoundHighSignal2 = True Then
+                                Data(CHAN2_PULSEWIDTH, ACTUAL) = k2 * BytesToSeconds * 1000
+                                k2 = 0
+                                If Data(CHAN2_PULSEWIDTH, ACTUAL) > Data(CHAN2_PULSEWIDTH, MAXIMUM) Then Data(CHAN2_PULSEWIDTH, MAXIMUM) = Data(CHAN2_PULSEWIDTH, ACTUAL)
+                                If Data(CHAN2_PULSEWIDTH, ACTUAL) < Data(CHAN2_PULSEWIDTH, MINIMUM) Then Data(CHAN2_PULSEWIDTH, MINIMUM) = Data(CHAN2_PULSEWIDTH, ACTUAL)
+                                Data(CHAN2_DUTYCYCLE, ACTUAL) = Data(CHAN2_PULSEWIDTH, ACTUAL) * Data(CHAN2_FREQUENCY, ACTUAL) / 10
+                                If Data(CHAN2_DUTYCYCLE, ACTUAL) > Data(CHAN2_DUTYCYCLE, MAXIMUM) Then Data(CHAN2_DUTYCYCLE, MAXIMUM) = Data(CHAN2_DUTYCYCLE, ACTUAL)
+                                If Data(CHAN2_DUTYCYCLE, ACTUAL) < Data(CHAN2_DUTYCYCLE, MINIMUM) Then Data(CHAN2_DUTYCYCLE, MINIMUM) = Data(CHAN2_DUTYCYCLE, ACTUAL)
+                            End If
+
+                            FoundHighSignal2 = False
+
+                        End If
+                        LastSignal2 = RawWaveData(j + 1) 'remember the last high signal and the current correction time
+                    End If
+                    CurrentSignalXPosition = (CurrentSignalXPosition + SignalXConversion) Mod PicSignalWidth
 
                 Next
 
@@ -2626,6 +2703,46 @@ Public Class Main
         End If
     End Sub
 #End Region
+#Region "Power run filename handling"
+    Private Sub SessionTextBox_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SessionTextBox.TextChanged
+        updateSessionPostfix()
+    End Sub
+
+    Private Sub SetDirButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SetDirButton.Click
+        If txtPowerrunDir.Text.Length > 0 Then
+            SelectFolderDialog.SelectedPath = txtPowerrunDir.Text
+        End If
+
+        If SelectFolderDialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            PowerrunDirLabel.Text = SelectFolderDialog.SelectedPath
+            txtPowerrunDir.Text = SelectFolderDialog.SelectedPath
+        End If
+    End Sub
+
+    Private Sub txtPowerrunDir_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPowerrunDir.TextChanged
+        'This is an invisible box so text validation should not be needed
+        PowerrunDirLabel.Text = "Power run dir: " & txtPowerrunDir.Text
+        updateSessionPostfix()
+    End Sub
+
+    Public Sub updateSessionPostfix()
+        If Not System.IO.Directory.Exists(txtPowerrunDir.Text) Then
+            Exit Sub
+        End If
+
+        Dim postfixProto As String = ""
+        Dim filePathProto As String = ""
+
+        For index As Integer = 1 To 999
+            postfixProto = "_" & index.ToString & ".sds"
+            filePathProto = txtPowerrunDir.Text & "\" & SessionTextBox.Text & postfixProto
+            If Not System.IO.File.Exists(filePathProto) Then
+                Exit For
+            End If
+        Next
+        PostfixLabel.Text = postfixProto
+    End Sub
+#End Region
 #Region "Serial Port Communications"
     Private Sub cmbAcquisition_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbAcquisition.SelectedIndexChanged
         If InStr(cmbAcquisition.SelectedItem.ToString, "Audio") <> 0 Then
@@ -2758,7 +2875,7 @@ Public Class Main
             DataAreUsed(PIN05VALUE) = False
         End If
 
-        
+
 
 
         btnResetMaxima_Click(Me, System.EventArgs.Empty)
@@ -2952,7 +3069,7 @@ Public Class Main
                                 End If
                                 Data(TORQUE_WHEEL, ACTUAL) = Data(POWER, ACTUAL) / Data(RPM1_WHEEL, ACTUAL) 'back calculate the torque at the wheel and motor based on the calculated power
                                 Data(TORQUE_MOTOR, ACTUAL) = Data(POWER, ACTUAL) / Data(RPM1_MOTOR, ACTUAL)
-                            
+
                                 If Data(TORQUE_ROLLER, ACTUAL) > Data(TORQUE_ROLLER, MAXIMUM) Then 'set the maximum values for torque
                                     Data(TORQUE_ROLLER, MAXIMUM) = Data(TORQUE_ROLLER, ACTUAL)
                                     Data(TORQUE_WHEEL, MAXIMUM) = Data(TORQUE_WHEEL, ACTUAL)
@@ -3137,7 +3254,7 @@ Public Class Main
                     btnHide.Enabled = True
                     btnShow.Enabled = False
             End Select
-           
+
         End If
     End Sub
     Private Sub LoadInterface()
@@ -3229,8 +3346,8 @@ Public Class Main
                     InterfaceInputFile.Close()
                     InterfaceInputFile.Dispose()
             End Select
-           
-            
+
+
 
 
         End If
@@ -3530,7 +3647,8 @@ Public Class Main
 #End If
 #End Region
 
-   
+
+    
 End Class
 #Region "DoubleBufferPanel Class"
 Public Class DoubleBufferPanel

@@ -986,6 +986,7 @@ Public Class Fit
         End With
         'Save the file
         DataOutputFile.Close()
+        Main.updateSessionPostfix()
     End Sub
     Sub MovingAverageSmooth(ByRef SentY() As Double, ByRef SentFY() As Double, ByVal WindowPercent As Double)
         Dim n As Long, w As Integer, t As Long, s As Long
