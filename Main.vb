@@ -429,6 +429,9 @@ Public Class Main
     Private MinimumPowerRunPoints As Double
     Private StopAddingBuffers As Boolean = False
 
+    'Time measurement for limiting subform activation rate
+    Private focusStopwatch As Stopwatch = Stopwatch.StartNew()
+
 #End Region
 #Region " Windows Form Designer generated code "
     Public Sub New()
@@ -1470,6 +1473,19 @@ Public Class Main
             End
         End Try
 
+    End Sub
+
+    Private Sub Main_Activated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Activated
+        ' Activate the subforms to bring them foreground when main form is brought foreground
+        ' This would be endless loop if not limited with a timer
+        If focusStopwatch.ElapsedMilliseconds > 500 Then
+            focusStopwatch.Restart()
+            For Each SDFrm As SimpleDynoSubForm In f
+                SDFrm.Activate()
+                ' Reactivate main form
+                Me.Focus()
+            Next
+        End If
     End Sub
 #End Region
 #Region "Text Box Checking"
@@ -3647,8 +3663,6 @@ Public Class Main
 #End If
 #End Region
 
-
-    
 End Class
 #Region "DoubleBufferPanel Class"
 Public Class DoubleBufferPanel
@@ -3659,5 +3673,5 @@ Public Class DoubleBufferPanel
         UpdateStyles()
     End Sub
 End Class
-#End Region 
+#End Region
 
