@@ -53,6 +53,9 @@ Partial Class Analysis
         Me.Label3 = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
+        Me.TextBox_XEnd = New System.Windows.Forms.TextBox()
+        Me.TextBox_XStart = New System.Windows.Forms.TextBox()
+        Me.RangeLabel = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
         'btnAddOverlayFile
@@ -85,7 +88,7 @@ Partial Class Analysis
         'cmbOverlayUnitsY2
         '
         Me.cmbOverlayUnitsY2.FormattingEnabled = True
-        Me.cmbOverlayUnitsY2.Location = New System.Drawing.Point(109, 246)
+        Me.cmbOverlayUnitsY2.Location = New System.Drawing.Point(109, 289)
         Me.cmbOverlayUnitsY2.Name = "cmbOverlayUnitsY2"
         Me.cmbOverlayUnitsY2.Size = New System.Drawing.Size(48, 21)
         Me.cmbOverlayUnitsY2.TabIndex = 92
@@ -93,7 +96,7 @@ Partial Class Analysis
         'cmbOverlayUnitsY1
         '
         Me.cmbOverlayUnitsY1.FormattingEnabled = True
-        Me.cmbOverlayUnitsY1.Location = New System.Drawing.Point(109, 192)
+        Me.cmbOverlayUnitsY1.Location = New System.Drawing.Point(109, 235)
         Me.cmbOverlayUnitsY1.Name = "cmbOverlayUnitsY1"
         Me.cmbOverlayUnitsY1.Size = New System.Drawing.Size(48, 21)
         Me.cmbOverlayUnitsY1.TabIndex = 91
@@ -101,16 +104,16 @@ Partial Class Analysis
         'cmbOverlayUnitsX
         '
         Me.cmbOverlayUnitsX.FormattingEnabled = True
-        Me.cmbOverlayUnitsX.Location = New System.Drawing.Point(109, 138)
+        Me.cmbOverlayUnitsX.Location = New System.Drawing.Point(62, 138)
         Me.cmbOverlayUnitsX.Name = "cmbOverlayUnitsX"
-        Me.cmbOverlayUnitsX.Size = New System.Drawing.Size(48, 21)
+        Me.cmbOverlayUnitsX.Size = New System.Drawing.Size(95, 21)
         Me.cmbOverlayUnitsX.TabIndex = 90
         '
         'Label48
         '
         Me.Label48.AutoSize = True
         Me.Label48.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label48.Location = New System.Drawing.Point(0, 209)
+        Me.Label48.Location = New System.Drawing.Point(0, 252)
         Me.Label48.Name = "Label48"
         Me.Label48.Size = New System.Drawing.Size(42, 13)
         Me.Label48.TabIndex = 89
@@ -120,7 +123,7 @@ Partial Class Analysis
         '
         Me.Label47.AutoSize = True
         Me.Label47.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label47.Location = New System.Drawing.Point(0, 155)
+        Me.Label47.Location = New System.Drawing.Point(0, 198)
         Me.Label47.Name = "Label47"
         Me.Label47.Size = New System.Drawing.Size(42, 13)
         Me.Label47.TabIndex = 88
@@ -140,7 +143,7 @@ Partial Class Analysis
         '
         Me.cmbOverlayDataY2.DropDownWidth = 150
         Me.cmbOverlayDataY2.FormattingEnabled = True
-        Me.cmbOverlayDataY2.Location = New System.Drawing.Point(3, 225)
+        Me.cmbOverlayDataY2.Location = New System.Drawing.Point(3, 268)
         Me.cmbOverlayDataY2.Name = "cmbOverlayDataY2"
         Me.cmbOverlayDataY2.Size = New System.Drawing.Size(154, 21)
         Me.cmbOverlayDataY2.TabIndex = 86
@@ -149,7 +152,7 @@ Partial Class Analysis
         '
         Me.cmbOverlayDataY1.DropDownWidth = 150
         Me.cmbOverlayDataY1.FormattingEnabled = True
-        Me.cmbOverlayDataY1.Location = New System.Drawing.Point(3, 171)
+        Me.cmbOverlayDataY1.Location = New System.Drawing.Point(3, 214)
         Me.cmbOverlayDataY1.Name = "cmbOverlayDataY1"
         Me.cmbOverlayDataY1.Size = New System.Drawing.Size(154, 21)
         Me.cmbOverlayDataY1.TabIndex = 85
@@ -167,7 +170,7 @@ Partial Class Analysis
         '
         Me.Label51.AutoSize = True
         Me.Label51.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label51.Location = New System.Drawing.Point(65, 387)
+        Me.Label51.Location = New System.Drawing.Point(65, 430)
         Me.Label51.Name = "Label51"
         Me.Label51.Size = New System.Drawing.Size(92, 13)
         Me.Label51.TabIndex = 100
@@ -176,7 +179,7 @@ Partial Class Analysis
         'cmbOverlayCorrectedSpeedUnits
         '
         Me.cmbOverlayCorrectedSpeedUnits.FormattingEnabled = True
-        Me.cmbOverlayCorrectedSpeedUnits.Location = New System.Drawing.Point(109, 403)
+        Me.cmbOverlayCorrectedSpeedUnits.Location = New System.Drawing.Point(109, 446)
         Me.cmbOverlayCorrectedSpeedUnits.Name = "cmbOverlayCorrectedSpeedUnits"
         Me.cmbOverlayCorrectedSpeedUnits.Size = New System.Drawing.Size(48, 21)
         Me.cmbOverlayCorrectedSpeedUnits.TabIndex = 99
@@ -184,7 +187,7 @@ Partial Class Analysis
         'cmbOverlayUnitsY4
         '
         Me.cmbOverlayUnitsY4.FormattingEnabled = True
-        Me.cmbOverlayUnitsY4.Location = New System.Drawing.Point(109, 354)
+        Me.cmbOverlayUnitsY4.Location = New System.Drawing.Point(109, 397)
         Me.cmbOverlayUnitsY4.Name = "cmbOverlayUnitsY4"
         Me.cmbOverlayUnitsY4.Size = New System.Drawing.Size(48, 21)
         Me.cmbOverlayUnitsY4.TabIndex = 98
@@ -192,7 +195,7 @@ Partial Class Analysis
         'cmbOverlayUnitsY3
         '
         Me.cmbOverlayUnitsY3.FormattingEnabled = True
-        Me.cmbOverlayUnitsY3.Location = New System.Drawing.Point(109, 300)
+        Me.cmbOverlayUnitsY3.Location = New System.Drawing.Point(109, 343)
         Me.cmbOverlayUnitsY3.Name = "cmbOverlayUnitsY3"
         Me.cmbOverlayUnitsY3.Size = New System.Drawing.Size(48, 21)
         Me.cmbOverlayUnitsY3.TabIndex = 97
@@ -201,7 +204,7 @@ Partial Class Analysis
         '
         Me.Label50.AutoSize = True
         Me.Label50.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label50.Location = New System.Drawing.Point(0, 317)
+        Me.Label50.Location = New System.Drawing.Point(0, 360)
         Me.Label50.Name = "Label50"
         Me.Label50.Size = New System.Drawing.Size(42, 13)
         Me.Label50.TabIndex = 96
@@ -211,7 +214,7 @@ Partial Class Analysis
         '
         Me.Label49.AutoSize = True
         Me.Label49.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label49.Location = New System.Drawing.Point(0, 263)
+        Me.Label49.Location = New System.Drawing.Point(0, 306)
         Me.Label49.Name = "Label49"
         Me.Label49.Size = New System.Drawing.Size(42, 13)
         Me.Label49.TabIndex = 95
@@ -221,7 +224,7 @@ Partial Class Analysis
         '
         Me.cmbOverlayDataY4.DropDownWidth = 150
         Me.cmbOverlayDataY4.FormattingEnabled = True
-        Me.cmbOverlayDataY4.Location = New System.Drawing.Point(3, 333)
+        Me.cmbOverlayDataY4.Location = New System.Drawing.Point(3, 376)
         Me.cmbOverlayDataY4.Name = "cmbOverlayDataY4"
         Me.cmbOverlayDataY4.Size = New System.Drawing.Size(154, 21)
         Me.cmbOverlayDataY4.TabIndex = 94
@@ -230,7 +233,7 @@ Partial Class Analysis
         '
         Me.cmbOverlayDataY3.DropDownWidth = 150
         Me.cmbOverlayDataY3.FormattingEnabled = True
-        Me.cmbOverlayDataY3.Location = New System.Drawing.Point(3, 279)
+        Me.cmbOverlayDataY3.Location = New System.Drawing.Point(3, 322)
         Me.cmbOverlayDataY3.Name = "cmbOverlayDataY3"
         Me.cmbOverlayDataY3.Size = New System.Drawing.Size(154, 21)
         Me.cmbOverlayDataY3.TabIndex = 93
@@ -238,7 +241,7 @@ Partial Class Analysis
         'lblCurrentXValue
         '
         Me.lblCurrentXValue.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblCurrentXValue.Location = New System.Drawing.Point(85, 445)
+        Me.lblCurrentXValue.Location = New System.Drawing.Point(85, 488)
         Me.lblCurrentXValue.Name = "lblCurrentXValue"
         Me.lblCurrentXValue.Size = New System.Drawing.Size(72, 13)
         Me.lblCurrentXValue.TabIndex = 102
@@ -248,7 +251,7 @@ Partial Class Analysis
         '
         Me.Label9.AutoSize = True
         Me.Label9.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label9.Location = New System.Drawing.Point(0, 445)
+        Me.Label9.Location = New System.Drawing.Point(0, 488)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(85, 13)
         Me.Label9.TabIndex = 101
@@ -272,7 +275,7 @@ Partial Class Analysis
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(72, 141)
+        Me.Label1.Location = New System.Drawing.Point(17, 141)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(31, 13)
         Me.Label1.TabIndex = 104
@@ -281,7 +284,7 @@ Partial Class Analysis
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(72, 195)
+        Me.Label2.Location = New System.Drawing.Point(72, 238)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(31, 13)
         Me.Label2.TabIndex = 105
@@ -290,7 +293,7 @@ Partial Class Analysis
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(72, 249)
+        Me.Label3.Location = New System.Drawing.Point(72, 292)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(31, 13)
         Me.Label3.TabIndex = 106
@@ -299,7 +302,7 @@ Partial Class Analysis
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(72, 303)
+        Me.Label4.Location = New System.Drawing.Point(72, 346)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(31, 13)
         Me.Label4.TabIndex = 107
@@ -308,17 +311,43 @@ Partial Class Analysis
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(72, 357)
+        Me.Label5.Location = New System.Drawing.Point(72, 400)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(31, 13)
         Me.Label5.TabIndex = 108
         Me.Label5.Text = "Units"
+        '
+        'TextBox_XEnd
+        '
+        Me.TextBox_XEnd.Location = New System.Drawing.Point(110, 159)
+        Me.TextBox_XEnd.Name = "TextBox_XEnd"
+        Me.TextBox_XEnd.Size = New System.Drawing.Size(48, 20)
+        Me.TextBox_XEnd.TabIndex = 109
+        '
+        'TextBox_XStart
+        '
+        Me.TextBox_XStart.Location = New System.Drawing.Point(62, 159)
+        Me.TextBox_XStart.Name = "TextBox_XStart"
+        Me.TextBox_XStart.Size = New System.Drawing.Size(42, 20)
+        Me.TextBox_XStart.TabIndex = 110
+        '
+        'RangeLabel
+        '
+        Me.RangeLabel.AutoSize = True
+        Me.RangeLabel.Location = New System.Drawing.Point(17, 162)
+        Me.RangeLabel.Name = "RangeLabel"
+        Me.RangeLabel.Size = New System.Drawing.Size(39, 13)
+        Me.RangeLabel.TabIndex = 111
+        Me.RangeLabel.Text = "Range"
         '
         'Analysis
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(944, 555)
+        Me.Controls.Add(Me.RangeLabel)
+        Me.Controls.Add(Me.TextBox_XStart)
+        Me.Controls.Add(Me.TextBox_XEnd)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Label3)
@@ -388,4 +417,7 @@ Partial Class Analysis
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents TextBox_XEnd As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox_XStart As System.Windows.Forms.TextBox
+    Friend WithEvents RangeLabel As System.Windows.Forms.Label
 End Class

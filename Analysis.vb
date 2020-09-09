@@ -17,7 +17,16 @@ Public Class Analysis
     Private XOverlayEndFraction As Double
     Private YOverlayStartFraction As Double
     Private YOverlayEndFraction As Double
-    Dim xAxis As Double
+
+    Dim GraphStartCoordX As Integer
+    Dim GraphEndCoordX As Integer
+    Dim GraphStartCoordY As Integer
+    Dim GraphEndCoordY As Integer
+    Dim GraphWidthInCoords As Integer
+    Dim GraphHeightInCoords As Integer
+
+    Dim xRangeLenFraction As Double
+    Dim xRangeStartFraction As Double
     Private Const MAXDATAFILES As Integer = 5
     Private AnalyzedData(MAXDATAFILES, Main.LAST, Main.MAXDATAPOINTS) As Double
     Friend Sub Analysis_Setup()
@@ -74,6 +83,17 @@ Public Class Analysis
             Main.btnShow_Click(Me, System.EventArgs.Empty)
         End If
     End Sub
+
+    'Draw to the given bitmap, following the global draw area limits in order to not draw outside it
+    Public Sub DrawWithLimits(ByRef graph As System.Drawing.Graphics, ByVal pen As System.Drawing.Pen, ByVal x1 As Integer, ByVal y1 As Integer, ByVal x2 As Integer, ByVal y2 As Integer)
+        If (x1 >= GraphStartCoordX) And (x2 >= GraphStartCoordX) And
+                (x1 <= GraphEndCoordX) And (x2 <= GraphEndCoordX) And
+                (y1 >= GraphStartCoordY) And (y2 >= GraphStartCoordY) And
+                (y1 <= GraphEndCoordY) And (y2 <= GraphEndCoordY) Then
+            graph.DrawLine(pen, x1, y1, x2, y2)
+        End If
+    End Sub
+
     Public Sub pnlOverlaySetup()
         'CHECK - THIS WHOLE SUB COULD DO WITH REWORKING 
         If Main.Formloaded Then
@@ -124,7 +144,8 @@ Public Class Analysis
             Dim y1MaxAtX(MAXDATAFILES) As Double, y2MaxAtX(MAXDATAFILES) As Double, y3MaxAtX(MAXDATAFILES) As Double, y4MaxAtX(MAXDATAFILES) As Double, DragMaxAtX(MAXDATAFILES) As Double
             Dim y1MaxAtSelectedX(MAXDATAFILES) As Double, y2MaxAtSelectedX(MAXDATAFILES) As Double, y3MaxAtSelectedX(MAXDATAFILES) As Double, y4MaxAtSelectedX(MAXDATAFILES) As Double, DragMaxAtSelectedX(MAXDATAFILES) As Double
             Dim XMaxDifferencePointer(MAXDATAFILES) As Long
-            xAxis = 0
+            xRangeStartFraction = 0
+            xRangeLenFraction = 0
             Dim y1Axis As Double, y2Axis As Double, y3Axis As Double, y4Axis As Double
 
             Dim DragCompare As Double
@@ -170,16 +191,22 @@ Public Class Analysis
             XOverlayStartFraction = 0.125
             XOverlayEndFraction = 0.875
 
-            Dim XMaxDifference As Double
+            GraphStartCoordX = CInt(PicOverlayWidth * XOverlayStartFraction)
+            GraphEndCoordX = CInt(PicOverlayWidth * XOverlayEndFraction)
+            GraphStartCoordY = CInt(PicOverlayHeight * YOverlayStartFraction)
+            GraphEndCoordY = CInt(PicOverlayHeight * YOverlayEndFraction)
+            GraphWidthInCoords = CInt((XOverlayEndFraction - XOverlayStartFraction) * PicOverlayWidth)
+            GraphHeightInCoords = CInt((YOverlayEndFraction - YOverlayStartFraction) * PicOverlayHeight)
 
+            Dim XMaxDifference As Double
 
             For FileCount = 1 To OverlayFileCount
                 XMaxDifference = 100000
                 For Counter = 1 To CInt(AnalyzedData(FileCount, Main.SESSIONTIME, 0)) 'OvPoints(FileCount)
                     If AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, Counter) > xMax(FileCount) Then
                         xMax(FileCount) = AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, Counter)
-                        If xMax(FileCount) > xAxis Then
-                            xAxis = xMax(FileCount)
+                        If xMax(FileCount) > xRangeLenFraction Then
+                            xRangeLenFraction = xMax(FileCount)
                         End If
                     End If
                     'Check to see if we have passed the selected X value - this needs more work?
@@ -240,14 +267,31 @@ Public Class Analysis
             Next
 
             'Set Axes to 1 if there are no data (i.e. the axis would be set to zero)
-            If xAxis = 0 Then xAxis = 1
+            If xRangeLenFraction = 0 Then xRangeLenFraction = 1
             If y1Axis = 0 Then y1Axis = 1
             If y2Axis = 0 Then y2Axis = 1
             If y3Axis = 0 Then y3Axis = 1
             If y4Axis = 0 Then y4Axis = 1
 
+            'Apply X-axis range settings if valid ones are given
+            Dim xRangeStartInActualUnit As Double = 0
+            Try
+                xRangeStartInActualUnit = Convert.ToInt32(TextBox_XStart.Text)
+                xRangeStartFraction = xRangeStartInActualUnit / Main.DataUnits(cmbOverlayDataX.SelectedIndex, cmbOverlayUnitsX.SelectedIndex)
+            Catch e As Exception
+            End Try
+            'Apply this for the situation where X range end is not manually given
+            xRangeLenFraction -= xRangeStartFraction
+            Dim xRangeLenInActualUnit As Double = xRangeLenFraction * Main.DataUnits(cmbOverlayDataX.SelectedIndex, cmbOverlayUnitsX.SelectedIndex)
+            Try
+                xRangeLenInActualUnit = Convert.ToInt32(TextBox_XEnd.Text)
+                xRangeLenInActualUnit -= xRangeStartInActualUnit
+                xRangeLenFraction = xRangeLenInActualUnit / Main.DataUnits(cmbOverlayDataX.SelectedIndex, cmbOverlayUnitsX.SelectedIndex)
+            Catch e As Exception
+            End Try
+
             'CHECK - THESE Might be better off using new custom round or format
-            xAxis = Main.CustomRound(xAxis)
+            xRangeLenFraction = Main.CustomRound(xRangeLenFraction)
             y1Axis = Main.CustomRound(y1Axis)
             y2Axis = Main.CustomRound(y2Axis)
             y3Axis = Main.CustomRound(y3Axis)
@@ -261,32 +305,48 @@ Public Class Analysis
             With OverlayBMP
                 .Clear(Color.White)
                 'Draw Three Axes (Left, Right and Bottom)
-                .DrawLine(AxisPen, CInt(PicOverlayWidth * XOverlayStartFraction), CInt(PicOverlayHeight * YOverlayEndFraction), CInt(PicOverlayWidth * XOverlayEndFraction), CInt(PicOverlayHeight * YOverlayEndFraction))
-                .DrawLine(AxisPen, CInt(PicOverlayWidth * XOverlayStartFraction), CInt(PicOverlayHeight * YOverlayStartFraction), CInt(PicOverlayWidth * XOverlayStartFraction), CInt(PicOverlayHeight * YOverlayEndFraction))
-                .DrawLine(AxisPen, CInt(PicOverlayWidth * XOverlayEndFraction), CInt(PicOverlayHeight * YOverlayStartFraction), CInt(PicOverlayWidth * XOverlayEndFraction), CInt(PicOverlayHeight * YOverlayEndFraction))
+                .DrawLine(AxisPen,
+                          GraphStartCoordX,
+                          GraphEndCoordY,
+                          GraphEndCoordX,
+                          GraphEndCoordY)
+                .DrawLine(AxisPen,
+                          GraphStartCoordX,
+                          GraphStartCoordY,
+                          GraphStartCoordX,
+                          GraphEndCoordY)
+                .DrawLine(AxisPen,
+                          GraphEndCoordX,
+                          GraphStartCoordY,
+                          GraphEndCoordX,
+                          GraphEndCoordY)
                 'X-Axis Details
                 'Calculate the space between ticks
-                TickInterval = PicOverlayWidth * (XOverlayEndFraction - XOverlayStartFraction) * 1 / 5
-                For Counter = 0 To 4
+                TickInterval = PicOverlayWidth * (XOverlayEndFraction - XOverlayStartFraction) * 1 / 10
+                For Counter = 0 To 9
                     'generate the tick label
-                    TempString = Main.NewCustomFormat(((xAxis) * Main.DataUnits(cmbOverlayDataX.SelectedIndex, cmbOverlayUnitsX.SelectedIndex)) / 5 * (Counter + 1))
+                    TempString = Main.NewCustomFormat(xRangeStartInActualUnit + (xRangeLenInActualUnit / 10 * (Counter + 1)))
                     'draw the tick
-                    .DrawLine(AxisPen, CInt(PicOverlayWidth * XOverlayStartFraction + (TickInterval * (Counter + 1))), CInt(PicOverlayHeight * YOverlayEndFraction), CInt(PicOverlayWidth * XOverlayStartFraction + (TickInterval * (Counter + 1))), CInt(PicOverlayHeight * YOverlayEndFraction + TickLength))
+                    .DrawLine(AxisPen, CInt(GraphStartCoordX + (TickInterval * (Counter + 1))), CInt(GraphEndCoordY), CInt(GraphStartCoordX + (TickInterval * (Counter + 1))), CInt(GraphEndCoordY + TickLength))
                     'draw the label
-                    .DrawString(TempString, AxisFont, AxisBrush, CInt(PicOverlayWidth * XOverlayStartFraction + (TickInterval * (Counter + 1)) - .MeasureString(TempString, AxisFont).Width / 2), CInt(PicOverlayHeight * YOverlayEndFraction + TickLength))
+                    .DrawString(TempString, AxisFont, AxisBrush, CInt(GraphStartCoordX + (TickInterval * (Counter + 1)) - .MeasureString(TempString, AxisFont).Width / 2), CInt(GraphEndCoordY + TickLength))
                 Next
                 'generate the axis title string...
                 TempString = Main.DataTags(cmbOverlayDataX.SelectedIndex) & " (" & Split(Main.DataUnitTags(cmbOverlayDataX.SelectedIndex), " ")(cmbOverlayUnitsX.SelectedIndex) & ")"
                 '...and draw.
-                .DrawString(TempString, HeadingsFont, AxisBrush, CInt(PicOverlayWidth / 2 - .MeasureString(TempString, HeadingsFont).Width / 2), CInt(PicOverlayHeight * YOverlayEndFraction) + TickLength + .MeasureString("9", AxisFont).Height)
+                .DrawString(TempString, HeadingsFont, AxisBrush, CInt(PicOverlayWidth / 2 - .MeasureString(TempString, HeadingsFont).Width / 2), CInt(GraphEndCoordY) + TickLength + .MeasureString("9", AxisFont).Height)
                 'prefix the string with "Max" for the results at the top of the page...
                 'Version 6.4 moving the Max prefix to the units line to avoid overcrowding
                 'If OverlayPlotMax Then
                 'TempString = "Max " & Main.DataTags(cmbOverlayDataX.SelectedIndex)
                 'Else
                 TempString = Main.DataTags(cmbOverlayDataX.SelectedIndex)
-                'CHECK FOR REMOVAL Debug.Print(OverlayXSelected & " " & xAxis)
-                .DrawLine(Pens.Gray, CInt(XOverlayStartFraction * PicOverlayWidth + (OverlayXSelected / xAxis) * (XOverlayEndFraction - XOverlayStartFraction) * PicOverlayWidth), CInt(YOverlayStartFraction * PicOverlayHeight), CInt(XOverlayStartFraction * PicOverlayWidth + (OverlayXSelected / xAxis) * (XOverlayEndFraction - XOverlayStartFraction) * PicOverlayWidth), CInt(YOverlayEndFraction * PicOverlayHeight))
+                'CHECK FOR REMOVAL Debug.Print(OverlayXSelected & " " & xRangeLenFraction)
+                .DrawLine(Pens.Gray,
+                          CInt(GraphStartCoordX + ((OverlayXSelected - xRangeStartFraction) / xRangeLenFraction) * GraphWidthInCoords),
+                          CInt(GraphStartCoordY),
+                          CInt(GraphStartCoordX + ((OverlayXSelected - xRangeStartFraction) / xRangeLenFraction) * GraphWidthInCoords),
+                          CInt(GraphEndCoordY))
                 'End If
                 'and draw the column heading
                 .DrawString(TempString, HeadingsFont, AxisBrush, XColumn - .MeasureString(TempString, HeadingsFont).Width / 2, Titleline)
@@ -319,11 +379,11 @@ Public Class Analysis
                     TickInterval = PicOverlayHeight * (YOverlayEndFraction - YOverlayStartFraction) * 1 / 5
                     For Counter = 0 To 4
                         TempString = Main.NewCustomFormat((((y1Axis) * Main.DataUnits(cmbOverlayDataY1.SelectedIndex, cmbOverlayUnitsY1.SelectedIndex)) / 5 * (5 - Counter)))
-                        .DrawLine(AxisPen, CInt(PicOverlayWidth * XOverlayStartFraction - TickLength), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter)), CInt(PicOverlayWidth * XOverlayStartFraction), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter)))
-                        .DrawString(TempString, AxisFont, AxisBrush, CInt(PicOverlayWidth * XOverlayStartFraction - TickLength - .MeasureString(TempString, AxisFont).Width), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter) - .MeasureString(TempString, AxisFont).Height / 2))
+                        .DrawLine(AxisPen, CInt(GraphStartCoordX - TickLength), CInt(GraphStartCoordY + (TickInterval * Counter)), CInt(GraphStartCoordX), CInt(GraphStartCoordY + (TickInterval * Counter)))
+                        .DrawString(TempString, AxisFont, AxisBrush, CInt(GraphStartCoordX - TickLength - .MeasureString(TempString, AxisFont).Width), CInt(GraphStartCoordY + (TickInterval * Counter) - .MeasureString(TempString, AxisFont).Height / 2))
                     Next
                     TempString = Main.DataTags(cmbOverlayDataY1.SelectedIndex) & vbCrLf & "(" & Split(Main.DataUnitTags(cmbOverlayDataY1.SelectedIndex), " ")(cmbOverlayUnitsY1.SelectedIndex) & ")"
-                    .DrawString(TempString, Y1Font, Y1Brush, CInt(PicOverlayWidth * XOverlayStartFraction - .MeasureString(TempString, Y1Font).Width), CInt(PicOverlayHeight * YOverlayStartFraction - 5 - .MeasureString(TempString, Y1Font).Height)) ' * 1.5))
+                    .DrawString(TempString, Y1Font, Y1Brush, CInt(GraphStartCoordX - .MeasureString(TempString, Y1Font).Width), CInt(GraphStartCoordY - 5 - .MeasureString(TempString, Y1Font).Height)) ' * 1.5))
                     'If OverlayPlotMax Then
                     'TempString = "Max " & Main.DataTags(cmbOverlayDataY1.SelectedIndex)
                     '.DrawString(TempString, HeadingsFont, AxisBrush, Y1Column - .MeasureString(TempString, HeadingsFont).Width / 2, Titleline)
@@ -348,20 +408,24 @@ Public Class Analysis
 
                         Y1Pen.DashStyle = OverlayDashes(FileCount)
                         For Counter = 2 To EqualSpacingCount - 1
-                            .DrawLine(Y1Pen, CInt(XOverlayStartFraction * PicOverlayWidth + ((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter)))) / xAxis) * (XOverlayEndFraction - XOverlayStartFraction) * PicOverlayWidth), CInt(YOverlayEndFraction * PicOverlayHeight - (AnalyzedData(FileCount, cmbOverlayDataY1.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter))) / y1Axis) * (YOverlayEndFraction - YOverlayStartFraction) * PicOverlayHeight), CInt(XOverlayStartFraction * PicOverlayWidth + ((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1)))) / xAxis) * (XOverlayEndFraction - XOverlayStartFraction) * PicOverlayWidth), CInt(YOverlayEndFraction * PicOverlayHeight - (AnalyzedData(FileCount, cmbOverlayDataY1.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1))) / y1Axis) * (YOverlayEndFraction - YOverlayStartFraction) * PicOverlayHeight))
+                            DrawWithLimits(OverlayBMP, Y1Pen,
+                                      CInt(GraphStartCoordX + (((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter)))) - xRangeStartFraction) / xRangeLenFraction) * GraphWidthInCoords),
+                                      CInt(GraphEndCoordY - (AnalyzedData(FileCount, cmbOverlayDataY1.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter))) / y1Axis) * GraphHeightInCoords),
+                                      CInt(GraphStartCoordX + (((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1)))) - xRangeStartFraction) / xRangeLenFraction) * GraphWidthInCoords),
+                                      CInt(GraphEndCoordY - (AnalyzedData(FileCount, cmbOverlayDataY1.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1))) / y1Axis) * GraphHeightInCoords))
                         Next
                     Next
                 End If
 
-                    If cmbOverlayDataY2.SelectedIndex <> Main.LAST Then
-                        TickInterval = PicOverlayHeight * (YOverlayEndFraction - YOverlayStartFraction) * 1 / 5
-                        For Counter = 0 To 4
-                            TempString = Main.NewCustomFormat((((y2Axis) * Main.DataUnits(cmbOverlayDataY2.SelectedIndex, cmbOverlayUnitsY2.SelectedIndex)) / 5 * (5 - Counter)))
-                            .DrawLine(AxisPen, CInt(PicOverlayWidth * XOverlayStartFraction), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter)), CInt(PicOverlayWidth * XOverlayStartFraction + TickLength), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter)))
-                            .DrawString(TempString, AxisFont, AxisBrush, CInt(PicOverlayWidth * XOverlayStartFraction + TickLength), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter) - .MeasureString(TempString, AxisFont).Height / 2))
-                        Next
-                        TempString = Main.DataTags(cmbOverlayDataY2.SelectedIndex) & vbCrLf & "(" & Split(Main.DataUnitTags(cmbOverlayDataY2.SelectedIndex), " ")(cmbOverlayUnitsY2.SelectedIndex) & ")"
-                        .DrawString(TempString, Y2Font, Y2Brush, CInt(PicOverlayWidth * XOverlayStartFraction), CInt(PicOverlayHeight * YOverlayStartFraction - 5 - .MeasureString(TempString, Y2Font).Height)) ' * 1.5))
+                If cmbOverlayDataY2.SelectedIndex <> Main.LAST Then
+                    TickInterval = PicOverlayHeight * (YOverlayEndFraction - YOverlayStartFraction) * 1 / 5
+                    For Counter = 0 To 4
+                        TempString = Main.NewCustomFormat((((y2Axis) * Main.DataUnits(cmbOverlayDataY2.SelectedIndex, cmbOverlayUnitsY2.SelectedIndex)) / 5 * (5 - Counter)))
+                        .DrawLine(AxisPen, CInt(GraphStartCoordX), CInt(GraphStartCoordY + (TickInterval * Counter)), CInt(GraphStartCoordX + TickLength), CInt(GraphStartCoordY + (TickInterval * Counter)))
+                        .DrawString(TempString, AxisFont, AxisBrush, CInt(GraphStartCoordX + TickLength), CInt(GraphStartCoordY + (TickInterval * Counter) - .MeasureString(TempString, AxisFont).Height / 2))
+                    Next
+                    TempString = Main.DataTags(cmbOverlayDataY2.SelectedIndex) & vbCrLf & "(" & Split(Main.DataUnitTags(cmbOverlayDataY2.SelectedIndex), " ")(cmbOverlayUnitsY2.SelectedIndex) & ")"
+                    .DrawString(TempString, Y2Font, Y2Brush, CInt(GraphStartCoordX), CInt(GraphStartCoordY - 5 - .MeasureString(TempString, Y2Font).Height)) ' * 1.5))
                     'If OverlayPlotMax Then
                     'TempString = "Max " & Main.DataTags(cmbOverlayDataY2.SelectedIndex)
                     '.DrawString(TempString, HeadingsFont, AxisBrush, Y2Column - .MeasureString(TempString, HeadingsFont).Width / 2, Titleline)
@@ -386,20 +450,24 @@ Public Class Analysis
                         End If
                         Y2Pen.DashStyle = OverlayDashes(FileCount)
                         For Counter = 2 To EqualSpacingCount - 1
-                            .DrawLine(Y2Pen, CInt(XOverlayStartFraction * PicOverlayWidth + ((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter)))) / xAxis) * (XOverlayEndFraction - XOverlayStartFraction) * PicOverlayWidth), CInt(YOverlayEndFraction * PicOverlayHeight - (AnalyzedData(FileCount, cmbOverlayDataY2.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter))) / y2Axis) * (YOverlayEndFraction - YOverlayStartFraction) * PicOverlayHeight), CInt(XOverlayStartFraction * PicOverlayWidth + ((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1)))) / xAxis) * (XOverlayEndFraction - XOverlayStartFraction) * PicOverlayWidth), CInt(YOverlayEndFraction * PicOverlayHeight - (AnalyzedData(FileCount, cmbOverlayDataY2.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1))) / y2Axis) * (YOverlayEndFraction - YOverlayStartFraction) * PicOverlayHeight))
+                            DrawWithLimits(OverlayBMP, Y2Pen,
+                                      CInt(GraphStartCoordX + (((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter)))) - xRangeStartFraction) / xRangeLenFraction) * GraphWidthInCoords),
+                                      CInt(GraphEndCoordY - (AnalyzedData(FileCount, cmbOverlayDataY2.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter))) / y2Axis) * GraphHeightInCoords),
+                                      CInt(GraphStartCoordX + (((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1)))) - xRangeStartFraction) / xRangeLenFraction) * GraphWidthInCoords),
+                                      CInt(GraphEndCoordY - (AnalyzedData(FileCount, cmbOverlayDataY2.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1))) / y2Axis) * GraphHeightInCoords))
                         Next
                     Next
                 End If
 
-                    If cmbOverlayDataY3.SelectedIndex <> Main.LAST Then
-                        TickInterval = PicOverlayHeight * (YOverlayEndFraction - YOverlayStartFraction) * 1 / 5
-                        For Counter = 0 To 4
-                            TempString = Main.NewCustomFormat((((y3Axis) * Main.DataUnits(cmbOverlayDataY3.SelectedIndex, cmbOverlayUnitsY3.SelectedIndex)) / 5 * (5 - Counter)))
-                            .DrawLine(AxisPen, CInt(PicOverlayWidth * XOverlayEndFraction - TickLength), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter)), CInt(PicOverlayWidth * XOverlayEndFraction), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter)))
-                            .DrawString(TempString, AxisFont, AxisBrush, CInt(PicOverlayWidth * XOverlayEndFraction - TickLength - .MeasureString(TempString, AxisFont).Width), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter) - .MeasureString(TempString, AxisFont).Height / 2))
-                        Next
-                        TempString = Main.DataTags(cmbOverlayDataY3.SelectedIndex) & vbCrLf & "(" & Split(Main.DataUnitTags(cmbOverlayDataY3.SelectedIndex), " ")(cmbOverlayUnitsY3.SelectedIndex) & ")"
-                        .DrawString(TempString, Y3Font, Y3Brush, CInt(PicOverlayWidth * XOverlayEndFraction - .MeasureString(TempString, Y3Font).Width), CInt(PicOverlayHeight * YOverlayStartFraction - 5 - .MeasureString(TempString, Y3Font).Height)) '* 1.5))
+                If cmbOverlayDataY3.SelectedIndex <> Main.LAST Then
+                    TickInterval = PicOverlayHeight * (YOverlayEndFraction - YOverlayStartFraction) * 1 / 5
+                    For Counter = 0 To 4
+                        TempString = Main.NewCustomFormat((((y3Axis) * Main.DataUnits(cmbOverlayDataY3.SelectedIndex, cmbOverlayUnitsY3.SelectedIndex)) / 5 * (5 - Counter)))
+                        .DrawLine(AxisPen, CInt(GraphEndCoordX - TickLength), CInt(GraphStartCoordY + (TickInterval * Counter)), CInt(GraphEndCoordX), CInt(GraphStartCoordY + (TickInterval * Counter)))
+                        .DrawString(TempString, AxisFont, AxisBrush, CInt(GraphEndCoordX - TickLength - .MeasureString(TempString, AxisFont).Width), CInt(GraphStartCoordY + (TickInterval * Counter) - .MeasureString(TempString, AxisFont).Height / 2))
+                    Next
+                    TempString = Main.DataTags(cmbOverlayDataY3.SelectedIndex) & vbCrLf & "(" & Split(Main.DataUnitTags(cmbOverlayDataY3.SelectedIndex), " ")(cmbOverlayUnitsY3.SelectedIndex) & ")"
+                    .DrawString(TempString, Y3Font, Y3Brush, CInt(GraphEndCoordX - .MeasureString(TempString, Y3Font).Width), CInt(GraphStartCoordY - 5 - .MeasureString(TempString, Y3Font).Height)) '* 1.5))
                     'If OverlayPlotMax Then
                     'TempString = "Max " & Main.DataTags(cmbOverlayDataY3.SelectedIndex)
                     '.DrawString(TempString, HeadingsFont, AxisBrush, Y3Column - .MeasureString(TempString, HeadingsFont).Width / 2, Titleline)
@@ -425,20 +493,24 @@ Public Class Analysis
 
                         Y3Pen.DashStyle = OverlayDashes(FileCount)
                         For Counter = 2 To EqualSpacingCount - 1
-                            .DrawLine(Y3Pen, CInt(XOverlayStartFraction * PicOverlayWidth + ((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter)))) / xAxis) * (XOverlayEndFraction - XOverlayStartFraction) * PicOverlayWidth), CInt(YOverlayEndFraction * PicOverlayHeight - (AnalyzedData(FileCount, cmbOverlayDataY3.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter))) / y3Axis) * (YOverlayEndFraction - YOverlayStartFraction) * PicOverlayHeight), CInt(XOverlayStartFraction * PicOverlayWidth + ((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1)))) / xAxis) * (XOverlayEndFraction - XOverlayStartFraction) * PicOverlayWidth), CInt(YOverlayEndFraction * PicOverlayHeight - (AnalyzedData(FileCount, cmbOverlayDataY3.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1))) / y3Axis) * (YOverlayEndFraction - YOverlayStartFraction) * PicOverlayHeight))
+                            DrawWithLimits(OverlayBMP, Y3Pen,
+                                      CInt(GraphStartCoordX + (((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter)))) - xRangeStartFraction) / xRangeLenFraction) * GraphWidthInCoords),
+                                      CInt(GraphEndCoordY - (AnalyzedData(FileCount, cmbOverlayDataY3.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter))) / y3Axis) * GraphHeightInCoords),
+                                      CInt(GraphStartCoordX + (((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1)))) - xRangeStartFraction) / xRangeLenFraction) * GraphWidthInCoords),
+                                      CInt(GraphEndCoordY - (AnalyzedData(FileCount, cmbOverlayDataY3.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1))) / y3Axis) * GraphHeightInCoords))
                         Next
                     Next
                 End If
 
-                    If cmbOverlayDataY4.SelectedIndex <> Main.LAST Then
-                        TickInterval = PicOverlayHeight * (YOverlayEndFraction - YOverlayStartFraction) * 1 / 5
-                        For Counter = 0 To 4
-                            TempString = Main.NewCustomFormat((((y4Axis) * Main.DataUnits(cmbOverlayDataY4.SelectedIndex, cmbOverlayUnitsY4.SelectedIndex)) / 5 * (5 - Counter)))
-                            .DrawLine(AxisPen, CInt(PicOverlayWidth * XOverlayEndFraction), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter)), CInt(PicOverlayWidth * XOverlayEndFraction + TickLength), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter)))
-                            .DrawString(TempString, AxisFont, AxisBrush, CInt(PicOverlayWidth * XOverlayEndFraction + TickLength), CInt(PicOverlayHeight * YOverlayStartFraction + (TickInterval * Counter) - .MeasureString(TempString, AxisFont).Height / 2))
-                        Next
-                        TempString = Main.DataTags(cmbOverlayDataY4.SelectedIndex) & vbCrLf & "(" & Split(Main.DataUnitTags(cmbOverlayDataY4.SelectedIndex), " ")(cmbOverlayUnitsY4.SelectedIndex) & ")"
-                        .DrawString(TempString, Y4Font, Y4Brush, CInt(PicOverlayWidth * XOverlayEndFraction), CInt(PicOverlayHeight * YOverlayStartFraction - 5 - .MeasureString(TempString, Y4Font).Height)) ' * 1.5))
+                If cmbOverlayDataY4.SelectedIndex <> Main.LAST Then
+                    TickInterval = PicOverlayHeight * (YOverlayEndFraction - YOverlayStartFraction) * 1 / 5
+                    For Counter = 0 To 4
+                        TempString = Main.NewCustomFormat((((y4Axis) * Main.DataUnits(cmbOverlayDataY4.SelectedIndex, cmbOverlayUnitsY4.SelectedIndex)) / 5 * (5 - Counter)))
+                        .DrawLine(AxisPen, CInt(GraphEndCoordX), CInt(GraphStartCoordY + (TickInterval * Counter)), CInt(GraphEndCoordX + TickLength), CInt(GraphStartCoordY + (TickInterval * Counter)))
+                        .DrawString(TempString, AxisFont, AxisBrush, CInt(GraphEndCoordX + TickLength), CInt(GraphStartCoordY + (TickInterval * Counter) - .MeasureString(TempString, AxisFont).Height / 2))
+                    Next
+                    TempString = Main.DataTags(cmbOverlayDataY4.SelectedIndex) & vbCrLf & "(" & Split(Main.DataUnitTags(cmbOverlayDataY4.SelectedIndex), " ")(cmbOverlayUnitsY4.SelectedIndex) & ")"
+                    .DrawString(TempString, Y4Font, Y4Brush, CInt(GraphEndCoordX), CInt(GraphStartCoordY - 5 - .MeasureString(TempString, Y4Font).Height)) ' * 1.5))
                     'If OverlayPlotMax Then
                     'TempString = "Max " & Main.DataTags(cmbOverlayDataY4.SelectedIndex)
                     '.DrawString(TempString, HeadingsFont, AxisBrush, Y4Column - .MeasureString(TempString, HeadingsFont).Width / 2, Titleline)
@@ -464,25 +536,29 @@ Public Class Analysis
 
                         Y4Pen.DashStyle = OverlayDashes(FileCount)
                         For Counter = 2 To EqualSpacingCount - 1
-                            .DrawLine(Y4Pen, CInt(XOverlayStartFraction * PicOverlayWidth + ((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter)))) / xAxis) * (XOverlayEndFraction - XOverlayStartFraction) * PicOverlayWidth), CInt(YOverlayEndFraction * PicOverlayHeight - (AnalyzedData(FileCount, cmbOverlayDataY4.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter))) / y4Axis) * (YOverlayEndFraction - YOverlayStartFraction) * PicOverlayHeight), CInt(XOverlayStartFraction * PicOverlayWidth + ((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1)))) / xAxis) * (XOverlayEndFraction - XOverlayStartFraction) * PicOverlayWidth), CInt(YOverlayEndFraction * PicOverlayHeight - (AnalyzedData(FileCount, cmbOverlayDataY4.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1))) / y4Axis) * (YOverlayEndFraction - YOverlayStartFraction) * PicOverlayHeight))
+                            DrawWithLimits(OverlayBMP, Y4Pen,
+                                      CInt(GraphStartCoordX + (((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter)))) - xRangeStartFraction) / xRangeLenFraction) * GraphWidthInCoords),
+                                      CInt(GraphEndCoordY - (AnalyzedData(FileCount, cmbOverlayDataY4.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter))) / y4Axis) * GraphHeightInCoords),
+                                      CInt(GraphStartCoordX + (((AnalyzedData(FileCount, cmbOverlayDataX.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1)))) - xRangeStartFraction) / xRangeLenFraction) * GraphWidthInCoords),
+                                      CInt(GraphEndCoordY - (AnalyzedData(FileCount, cmbOverlayDataY4.SelectedIndex, CInt(EqualSpacingPointers(FileCount, Counter + 1))) / y4Axis) * GraphHeightInCoords))
                         Next
                     Next
                 End If
 
-                    'Hack Job for corrected speed
-                    TempString = "Max Corr. Speed" ' & DataTags(DRAG)
-                    .DrawString(TempString, HeadingsFont, AxisBrush, YDragColumn - .MeasureString(TempString, HeadingsFont).Width / 2, Titleline)
-                    TempString = "(" & Split(Main.DataUnitTags(Main.SPEED), " ")(cmbOverlayCorrectedSpeedUnits.SelectedIndex) & ")"
-                    .DrawString(TempString, HeadingsFont, AxisBrush, YDragColumn - .MeasureString(TempString, HeadingsFont).Width / 2, UnitsLine)
-                    For FileCount = 1 To OverlayFileCount
-                        DragCompare = Double.MaxValue
-                        Counter = 2
-                        Do
-                            Counter += 1
-                        Loop Until AnalyzedData(FileCount, Main.POWER, Counter) - AnalyzedData(FileCount, Main.DRAG, Counter) < 0 Or Counter = AnalyzedData(FileCount, Main.SESSIONTIME, 0)
-                        TempString = Main.NewCustomFormat(AnalyzedData(FileCount, Main.SPEED, Counter) * Main.DataUnits(Main.SPEED, cmbOverlayCorrectedSpeedUnits.SelectedIndex))  '& " @ " & NewCustomFormat(y4MaxAtX(FileCount) * DataUnits(cmbOverlayX.SelectedIndex, cmbOverlayXUnits.SelectedIndex)) & " " & Split(DataUnitTags(cmbOverlayX.SelectedIndex), " ")(cmbOverlayXUnits.SelectedIndex)
-                        .DrawString(TempString, ResultsFont, AxisBrush, YDragColumn - .MeasureString(TempString, ResultsFont).Width / 2, ResultsLine(FileCount))
-                    Next
+                'Hack Job for corrected speed
+                TempString = "Max Corr. Speed" ' & DataTags(DRAG)
+                .DrawString(TempString, HeadingsFont, AxisBrush, YDragColumn - .MeasureString(TempString, HeadingsFont).Width / 2, Titleline)
+                TempString = "(" & Split(Main.DataUnitTags(Main.SPEED), " ")(cmbOverlayCorrectedSpeedUnits.SelectedIndex) & ")"
+                .DrawString(TempString, HeadingsFont, AxisBrush, YDragColumn - .MeasureString(TempString, HeadingsFont).Width / 2, UnitsLine)
+                For FileCount = 1 To OverlayFileCount
+                    DragCompare = Double.MaxValue
+                    Counter = 2
+                    Do
+                        Counter += 1
+                    Loop Until AnalyzedData(FileCount, Main.POWER, Counter) - AnalyzedData(FileCount, Main.DRAG, Counter) < 0 Or Counter = AnalyzedData(FileCount, Main.SESSIONTIME, 0)
+                    TempString = Main.NewCustomFormat(AnalyzedData(FileCount, Main.SPEED, Counter) * Main.DataUnits(Main.SPEED, cmbOverlayCorrectedSpeedUnits.SelectedIndex))  '& " @ " & NewCustomFormat(y4MaxAtX(FileCount) * DataUnits(cmbOverlayX.SelectedIndex, cmbOverlayXUnits.SelectedIndex)) & " " & Split(DataUnitTags(cmbOverlayX.SelectedIndex), " ")(cmbOverlayXUnits.SelectedIndex)
+                    .DrawString(TempString, ResultsFont, AxisBrush, YDragColumn - .MeasureString(TempString, ResultsFont).Width / 2, ResultsLine(FileCount))
+                Next
 
             End With
 
@@ -863,6 +939,13 @@ Public Class Analysis
     Private Sub cmbOverlayCorrectedSpeedUnits_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbOverlayCorrectedSpeedUnits.SelectedIndexChanged
         pnlOverlaySetup()
     End Sub
+    Private Sub TextBox_XStart_changed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextBox_XStart.TextChanged
+        pnlOverlaySetup()
+    End Sub
+    Private Sub TextBox_XEnd_Changed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextBox_XEnd.TextChanged
+        pnlOverlaySetup()
+    End Sub
+
     'CHECK IF YOU WANT TO PULL ALL DECLARATIONS TO THE TOP
     Private OverlayXSelected As Double
     Private OverlayPlotMax As Boolean = True
@@ -877,10 +960,10 @@ Public Class Analysis
         MouseX = pnlDataOverlay.PointToClient(Control.MousePosition).X
         MouseY = pnlDataOverlay.PointToClient(Control.MousePosition).Y
 
-        LeftLimit = CInt(XOverlayStartFraction * PicOverlayWidth)
-        RightLimit = CInt(XOverlayEndFraction * PicOverlayWidth)
-        TopLimit = CInt(YOverlayStartFraction * PicOverlayHeight)
-        BottomLimit = CInt(YOverlayEndFraction * PicOverlayHeight)
+        LeftLimit = CInt(GraphStartCoordX)
+        RightLimit = CInt(GraphEndCoordX)
+        TopLimit = CInt(GraphStartCoordY)
+        BottomLimit = CInt(GraphEndCoordY)
 
         If MouseX < LeftLimit Or MouseX > RightLimit Then
             OverlayXSelected = 0
@@ -891,7 +974,7 @@ Public Class Analysis
                 OverlayPlotMax = True
             Else
                 'OverlayXSelected is the X value in the primary units being plotted
-                OverlayXSelected = (MouseX - LeftLimit) / (RightLimit - LeftLimit) * xAxis
+                OverlayXSelected = ((MouseX - LeftLimit) / (RightLimit - LeftLimit) * xRangeLenFraction) + xRangeStartFraction
                 OverlayPlotMax = False
                 lblCurrentXValue.Text = Main.NewCustomFormat(OverlayXSelected * Main.DataUnits(cmbOverlayDataX.SelectedIndex, cmbOverlayUnitsX.SelectedIndex)) & " " & cmbOverlayUnitsX.SelectedItem.ToString
             End If
