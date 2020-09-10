@@ -6,6 +6,8 @@ Imports System.Management
 Imports System.Drawing.Drawing2D
 Imports System.Collections.Generic
 Imports System.Runtime.InteropServices
+Imports System.Threading
+
 Public Class Main
     Inherits System.Windows.Forms.Form
 #Region "Compiler Constants"
@@ -1092,6 +1094,8 @@ Public Class Main
 
         'Open Up the default interface
         LoadInterface()
+
+        serialSimuThread.Start()
     End Sub
     Private Sub Form1_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         Formloaded = True
@@ -2960,7 +2964,6 @@ Public Class Main
         Try
             mySerialPort.Open()
             mySerialPort.DiscardInBuffer()
-            mySerialPort.ReadLine()
             AddHandler mySerialPort.DataReceived, AddressOf DataReceivedHandler
             'Enable Calibration buttons on com form
             For Each c As Control In frmCOM.Controls
@@ -2995,12 +2998,10 @@ Public Class Main
         End If
         ClosingCOMPort = False
     End Sub
-    Private Sub DataReceivedHandler(ByVal sender As Object, ByVal e As SerialDataReceivedEventArgs)
+    Private Sub DataReceivedLine(ByVal line As String)
         If Not ClosingCOMPort Then
             Try
                 Dim Locker As New Object
-                Dim sp As SerialPort = CType(sender, SerialPort)
-                Dim temp As String
                 Static rgbvalue As Integer = 150, rgbincrement As Integer = 10
                 Static OldSessionTime As Double
                 Dim RPM1ElapsedTime As Double, RPM1NewTriggerTime As Double
@@ -3008,8 +3009,7 @@ Public Class Main
                 Static RPM1OldTriggerTime As Double
                 Static RPM2OldTriggerTime As Double
 
-                temp = sp.ReadLine
-                COMPortMessage = Split(temp, ",")
+                COMPortMessage = Split(line, ",")
 
                 rgbvalue += rgbincrement
                 If rgbvalue > 240 Or rgbvalue < 50 Then rgbincrement *= -1
@@ -3231,6 +3231,22 @@ Public Class Main
                     SetControlText_Threadsafe(frmCOM.lblCurrentPinA5, NewCustomFormat(Data(PIN05VALUE, ACTUAL)))
 
                 End If
+            Catch ex As Exception
+                btnHide_Click(Me, EventArgs.Empty)
+                MsgBox("Serial Port Data Received Error: " & ex.ToString, MsgBoxStyle.Exclamation)
+                'btnShow_Click(Me, EventArgs.Empty)
+                End
+            End Try
+        End If
+    End Sub
+
+    Private Sub DataReceivedHandler(ByVal sender As Object, ByVal e As SerialDataReceivedEventArgs)
+        If Not ClosingCOMPort Then
+            Try
+                Dim sp As SerialPort = CType(sender, SerialPort)
+                Dim temp As String
+                temp = sp.ReadLine
+                DataReceivedLine(temp)
             Catch ex As Exception
                 btnHide_Click(Me, EventArgs.Empty)
                 MsgBox("Serial Port Data Received Error: " & ex.ToString, MsgBoxStyle.Exclamation)
@@ -3661,6 +3677,59 @@ Public Class Main
         Next
     End Sub
 #End If
+#End Region
+#Region "Simulation"
+    ' Thread function for running the simulated serial data
+    Private Sub serialSimuFunc()
+        Dim dirOfExecutable As String = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase)
+        Dim simuFilePath As String = New Uri(dirOfExecutable & "\serial_simulation.csv").LocalPath
+
+        Dim fileReader As System.IO.StreamReader = Nothing
+
+        Dim line As String
+        Dim wasPowerRun As Boolean = False
+        Dim previousTimestamp As Long = 0
+
+        While True
+            If WhichDataMode = POWERRUN Then
+
+                ' Open the file when entering powerrun
+                If Not wasPowerRun Then
+                    Try
+                        fileReader = My.Computer.FileSystem.OpenTextFileReader(simuFilePath)
+                    Catch e1 As Exception
+                        'Nothing to do
+                    End Try
+                    wasPowerRun = True
+                End If
+
+                If Not IsNothing(fileReader) Then
+                    line = fileReader.ReadLine()
+                    If IsNothing(line) Then
+                        fileReader.Close()
+                        fileReader = Nothing
+                    Else
+                        'Sleep according to simulated arduino timestamps 
+                        COMPortMessage = Split(line, ",")
+                        Dim currentTimestamp As Long = CInt(COMPortMessage(0))
+                        If previousTimestamp <> 0 Then
+                            Threading.Thread.Sleep(CInt((currentTimestamp - previousTimestamp) / 1000))
+                        End If
+                        previousTimestamp = currentTimestamp
+                        DataReceivedLine(line)
+                    End If
+                Else
+                    Threading.Thread.Sleep(500)
+                End If
+            Else
+                wasPowerRun = False
+                Threading.Thread.Sleep(500)
+            End If
+
+        End While
+    End Sub
+
+    Dim serialSimuThread As Thread = New Thread(New ThreadStart(AddressOf serialSimuFunc))
 #End Region
 
 End Class
