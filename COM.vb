@@ -735,4 +735,8 @@
             Main.COMPortCalibration()
         End If
     End Sub
+
+    Private Sub A5PowerRunCheckBox_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles A5PowerRunCheckBox.CheckedChanged
+        Main.A5PowerRunControl = A5PowerRunCheckBox.Checked
+    End Sub
 End Class

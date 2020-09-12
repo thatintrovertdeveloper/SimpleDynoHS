@@ -260,6 +260,7 @@ Public Class Main
     Public Shared A5ValueIntercept As Double
     Public Shared Resistance1 As Double
     Public Shared Resistance2 As Double
+    Public Shared A5PowerRunControl As Boolean
 
     'For new graphical interface
     Public Shared WithEvents f As New List(Of SimpleDynoSubForm)
@@ -1282,46 +1283,7 @@ Public Class Main
         End If
     End Function
     Private Sub btnStartPowerRun_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStartPowerRun.Click
-        Try
-            'Regardless of why we clicked it, the radio button for rpm on the fit form should be set for RPM
-            frmFit.rdoRPM1.Checked = True
-            If WhichDataMode = POWERRUN Then 'We are cancelling the power run
-                'CHECK - WE SHOULD REALLY MAKE SURE WE UNDO EVERYTHING THAT WAS DONE WHEN THE POWERRUN WAS INITIATED
-                btnStartLoggingRaw.Enabled = True
-                btnShow_Click(Me, EventArgs.Empty)
-                With btnStartPowerRun
-                    .BackColor = System.Windows.Forms.Control.DefaultBackColor
-                End With
-
-                If DataPoints <= MinimumPowerRunPoints Then
-                    'Unable to proceed with fitting if not enough data
-                    StopFitting = True
-                End If
-
-                WhichDataMode = LIVE 'This will tell Fit.vb that poer run has ended and it is time to fit
-            Else
-                btnHide_Click(Me, EventArgs.Empty)
-
-                LogPowerRunDataFileName = txtPowerrunDir.Text & "\" & SessionTextBox.Text & PostfixLabel.Text
-                ResetValues()
-                DataPoints = 0
-                ' DataPoints2 = 0
-                btnStartLoggingRaw.Enabled = False
-                btnShow_Click(Me, EventArgs.Empty)
-                With btnStartPowerRun
-                    .BackColor = Color.Red
-                End With
-                WhichDataMode = POWERRUN
-                StopFitting = False
-                frmFit.ProcessData() 'Put Fit.vb in mode where it waits for data until WhichDataMode changes
-
-            End If
-        Catch e1 As Exception
-            btnHide_Click(Me, EventArgs.Empty)
-            MsgBox("btnStartPowerRun_Click Error: " & e1.ToString, MsgBoxStyle.Exclamation)
-            btnShow_Click(Me, EventArgs.Empty)
-            End
-        End Try
+        TogglePowerRun()
     End Sub
     Private Sub btnResetMaxima_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnResetMaxima.Click
         ResetValues()
@@ -3216,23 +3178,13 @@ Public Class Main
                             End If
                         End If
 
-                        'If Not WavesStarted Then
-
-                        'End If
-
-
                         OldSessionTime = Data(SESSIONTIME, ACTUAL)
                         RPM1OldTriggerTime = RPM1NewTriggerTime
                         RPM2OldTriggerTime = RPM2NewTriggerTime
 
                     End SyncLock
 
-                    If WhichDataMode = POWERRUN AndAlso DataPoints > MinimumPowerRunPoints AndAlso Data(RPM1_ROLLER, ACTUAL) <= ActualPowerRunThreshold Then
-                        SetControlBackColor_ThreadSafe(btnStartPowerRun, System.Windows.Forms.Control.DefaultBackColor)
-                        'DataPoints -= 1
-                        PauseForms()
-                        WhichDataMode = LIVE
-                    End If
+                    DoPowerRunSerialControl(CDbl(COMPortMessage(10)))
 
                     SetControlText_Threadsafe(frmCOM.lblCurrentVolts, NewCustomFormat(Data(VOLTS, ACTUAL)))
                     SetControlText_Threadsafe(frmCOM.lblCurrentAmps, NewCustomFormat(Data(AMPS, ACTUAL)))
@@ -3266,6 +3218,75 @@ Public Class Main
             End Try
         End If
     End Sub
+
+    ' Serial port triggered events for the power run state
+    Private Sub DoPowerRunSerialControl(ByVal A5RawValue As Double)
+        Static A5PrevState As Boolean = False
+        If A5PowerRunControl Then
+            Dim A5Threshold As Double = (A5Voltage2 - A5Voltage1) / 2
+            Dim A5State As Boolean = A5RawValue > A5Threshold
+
+            ' Only trigger from A5 changes so that autostop due to roller stop is possible even when A5 remains up
+            If WhichDataMode = POWERRUN And A5PrevState And Not A5State Then
+                TogglePowerRun()
+            ElseIf WhichDataMode <> POWERRUN And A5State And Not A5PrevState Then
+                TogglePowerRun()
+            End If
+            A5PrevState = A5State
+        End If
+
+        ' Manually started powerrun automatically stops when roller RPM fall to zero
+        If WhichDataMode = POWERRUN AndAlso DataPoints > MinimumPowerRunPoints AndAlso Data(RPM1_ROLLER, ACTUAL) <= ActualPowerRunThreshold Then
+            TogglePowerRun()
+        End If
+    End Sub
+
+    Private Sub TogglePowerRun()
+        If Me.InvokeRequired Then
+            Me.Invoke(New Action(AddressOf TogglePowerRun))
+        Else
+            Try
+                'Regardless of why we clicked it, the radio button for rpm on the fit form should be set for RPM
+                frmFit.rdoRPM1.Checked = True
+                If WhichDataMode = POWERRUN Then 'We are cancelling the power run
+                    btnStartLoggingRaw.Enabled = True
+                    btnShow_Click(Me, EventArgs.Empty)
+                    With btnStartPowerRun
+                        .BackColor = System.Windows.Forms.Control.DefaultBackColor
+                    End With
+
+                    If DataPoints <= MinimumPowerRunPoints Then
+                        'Unable to proceed with fitting if not enough data
+                        StopFitting = True
+                    End If
+
+                    WhichDataMode = LIVE 'This will tell Fit.vb that poer run has ended and it is time to fit
+                Else
+                    btnHide_Click(Me, EventArgs.Empty)
+
+                    LogPowerRunDataFileName = txtPowerrunDir.Text & "\" & SessionTextBox.Text & PostfixLabel.Text
+                    ResetValues()
+                    DataPoints = 0
+                    ' DataPoints2 = 0
+                    btnStartLoggingRaw.Enabled = False
+                    btnShow_Click(Me, EventArgs.Empty)
+                    With btnStartPowerRun
+                        .BackColor = Color.Red
+                    End With
+                    WhichDataMode = POWERRUN
+                    StopFitting = False
+                    frmFit.ProcessData() 'Put Fit.vb in mode where it waits for data until WhichDataMode changes
+
+                End If
+            Catch e1 As Exception
+                btnHide_Click(Me, EventArgs.Empty)
+                MsgBox("btnStartPowerRun_Click Error: " & e1.ToString, MsgBoxStyle.Exclamation)
+                btnShow_Click(Me, EventArgs.Empty)
+                End
+            End Try
+        End If
+    End Sub
+
 #End Region
 #Region "New Interface Code"
     Private Sub btnLoad_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLoad.Click
