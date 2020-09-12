@@ -105,6 +105,7 @@ Partial Class COM
         Me.Label24 = New System.Windows.Forms.Label()
         Me.Label25 = New System.Windows.Forms.Label()
         Me.Label26 = New System.Windows.Forms.Label()
+        Me.A5PowerRunCheckBox = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'Label72
@@ -905,11 +906,22 @@ Partial Class COM
         Me.Label26.TabIndex = 264
         Me.Label26.Text = "When Pin A5 = "
         '
+        'A5PowerRunCheckBox
+        '
+        Me.A5PowerRunCheckBox.AutoSize = True
+        Me.A5PowerRunCheckBox.Location = New System.Drawing.Point(426, 516)
+        Me.A5PowerRunCheckBox.Name = "A5PowerRunCheckBox"
+        Me.A5PowerRunCheckBox.Size = New System.Drawing.Size(258, 17)
+        Me.A5PowerRunCheckBox.TabIndex = 268
+        Me.A5PowerRunCheckBox.Text = "Use A5 as binary signal for controlling Power Run"
+        Me.A5PowerRunCheckBox.UseVisualStyleBackColor = True
+        '
         'COM
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(944, 555)
+        Me.Controls.Add(Me.A5PowerRunCheckBox)
         Me.Controls.Add(Me.Label23)
         Me.Controls.Add(Me.Label24)
         Me.Controls.Add(Me.Label25)
@@ -1083,4 +1095,5 @@ Partial Class COM
     Friend WithEvents Label24 As System.Windows.Forms.Label
     Friend WithEvents Label25 As System.Windows.Forms.Label
     Friend WithEvents Label26 As System.Windows.Forms.Label
+    Friend WithEvents A5PowerRunCheckBox As System.Windows.Forms.CheckBox
 End Class

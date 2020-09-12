@@ -1576,6 +1576,7 @@ Public Class Main
             Dim cmbNew As New ComboBox
             Dim txtNew As New TextBox
             Dim scrlNew As VScrollBar
+            Dim cbNew As CheckBox
             If Directory.Exists(SettingsDirectory) Then 'Some Version of SimpleDyno has been run before
                 If File.Exists(SettingsDirectory & SettingsFile) Then 'From 6.4 on Settings files is simply SimpleDynoSettings.sds
                     Dim ParameterInputFile As New System.IO.StreamReader(SettingsDirectory & SettingsFile)
@@ -1635,6 +1636,11 @@ Public Class Main
                                         scrlNew = DirectCast(c, VScrollBar)
                                         TempIndex = CDbl(Temp.Substring(start, finish - start - 1))
                                         scrlNew.Value = CInt(TempIndex)
+                                        c.Select()
+                                    End If
+                                    If TypeOf c Is CheckBox Then
+                                        cbNew = DirectCast(c, CheckBox)
+                                        cbNew.Checked = Temp.Substring(start, finish - start - 1).Equals(Boolean.TrueString)
                                         c.Select()
                                     End If
                                 End If
@@ -1781,6 +1787,7 @@ Public Class Main
         Try
             Dim cmbNew As ComboBox
             Dim scrlNew As VScrollBar
+            Dim cbNew As CheckBox
             Dim ParameterOutputFile As New System.IO.StreamWriter(SettingsDirectory & SettingsFile)
             ParameterOutputFile.WriteLine(MainTitle)
 
@@ -1814,6 +1821,10 @@ Public Class Main
                 If TypeOf c Is VScrollBar Then
                     scrlNew = DirectCast(c, VScrollBar)
                     ParameterOutputFile.WriteLine("[" & c.Name.ToString & "]" & scrlNew.Value)
+                End If
+                If TypeOf c Is CheckBox Then
+                    cbNew = DirectCast(c, CheckBox)
+                    ParameterOutputFile.WriteLine("[" & c.Name.ToString & "]" & cbNew.Checked.ToString())
                 End If
             Next
 
