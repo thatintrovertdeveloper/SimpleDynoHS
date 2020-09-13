@@ -63,6 +63,11 @@ Partial Class Dyno
         Me.lblTargetMomentOfInertia = New System.Windows.Forms.Label()
         Me.lblDynoSettings = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
+        Me.RPM1RPM2TextBox = New System.Windows.Forms.TextBox()
+        Me.RPM1RPM2RatioCheckBox = New System.Windows.Forms.CheckBox()
+        Me.RawMOITextBox = New System.Windows.Forms.TextBox()
+        Me.DirectMOICheckBox = New System.Windows.Forms.CheckBox()
+        Me.FakeFocusTextBox = New System.Windows.Forms.TextBox()
         CType(Me.picDynoSettings, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -189,7 +194,7 @@ Partial Class Dyno
         'Label4
         '
         Me.Label4.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(88, 164)
+        Me.Label4.Location = New System.Drawing.Point(88, 178)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(160, 20)
         Me.Label4.TabIndex = 298
@@ -200,7 +205,7 @@ Partial Class Dyno
         '
         Me.txtSignalsPerRPM2.CausesValidation = False
         Me.txtSignalsPerRPM2.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtSignalsPerRPM2.Location = New System.Drawing.Point(176, 427)
+        Me.txtSignalsPerRPM2.Location = New System.Drawing.Point(176, 441)
         Me.txtSignalsPerRPM2.Name = "txtSignalsPerRPM2"
         Me.txtSignalsPerRPM2.Size = New System.Drawing.Size(72, 22)
         Me.txtSignalsPerRPM2.TabIndex = 296
@@ -211,7 +216,7 @@ Partial Class Dyno
         'Label24
         '
         Me.Label24.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label24.Location = New System.Drawing.Point(37, 427)
+        Me.Label24.Location = New System.Drawing.Point(37, 441)
         Me.Label24.Name = "Label24"
         Me.Label24.Size = New System.Drawing.Size(131, 20)
         Me.Label24.TabIndex = 297
@@ -222,7 +227,7 @@ Partial Class Dyno
         '
         Me.txtSignalsPerRPM1.CausesValidation = False
         Me.txtSignalsPerRPM1.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtSignalsPerRPM1.Location = New System.Drawing.Point(176, 403)
+        Me.txtSignalsPerRPM1.Location = New System.Drawing.Point(176, 417)
         Me.txtSignalsPerRPM1.Name = "txtSignalsPerRPM1"
         Me.txtSignalsPerRPM1.Size = New System.Drawing.Size(72, 22)
         Me.txtSignalsPerRPM1.TabIndex = 285
@@ -233,7 +238,7 @@ Partial Class Dyno
         'Label23
         '
         Me.Label23.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label23.Location = New System.Drawing.Point(72, 403)
+        Me.Label23.Location = New System.Drawing.Point(72, 417)
         Me.Label23.Name = "Label23"
         Me.Label23.Size = New System.Drawing.Size(96, 20)
         Me.Label23.TabIndex = 289
@@ -244,7 +249,7 @@ Partial Class Dyno
         '
         Me.txtExtraWallThickness.CausesValidation = False
         Me.txtExtraWallThickness.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtExtraWallThickness.Location = New System.Drawing.Point(176, 355)
+        Me.txtExtraWallThickness.Location = New System.Drawing.Point(176, 369)
         Me.txtExtraWallThickness.Name = "txtExtraWallThickness"
         Me.txtExtraWallThickness.Size = New System.Drawing.Size(72, 22)
         Me.txtExtraWallThickness.TabIndex = 283
@@ -256,7 +261,7 @@ Partial Class Dyno
         '
         Me.txtRollerDiameter.CausesValidation = False
         Me.txtRollerDiameter.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtRollerDiameter.Location = New System.Drawing.Point(176, 187)
+        Me.txtRollerDiameter.Location = New System.Drawing.Point(176, 201)
         Me.txtRollerDiameter.Name = "txtRollerDiameter"
         Me.txtRollerDiameter.Size = New System.Drawing.Size(72, 22)
         Me.txtRollerDiameter.TabIndex = 276
@@ -268,7 +273,7 @@ Partial Class Dyno
         '
         Me.txtExtraMass.CausesValidation = False
         Me.txtExtraMass.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtExtraMass.Location = New System.Drawing.Point(176, 379)
+        Me.txtExtraMass.Location = New System.Drawing.Point(176, 393)
         Me.txtExtraMass.Name = "txtExtraMass"
         Me.txtExtraMass.Size = New System.Drawing.Size(72, 22)
         Me.txtExtraMass.TabIndex = 284
@@ -279,7 +284,7 @@ Partial Class Dyno
         'Label22
         '
         Me.Label22.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label22.Location = New System.Drawing.Point(8, 235)
+        Me.Label22.Location = New System.Drawing.Point(8, 249)
         Me.Label22.Name = "Label22"
         Me.Label22.Size = New System.Drawing.Size(160, 20)
         Me.Label22.TabIndex = 288
@@ -289,7 +294,7 @@ Partial Class Dyno
         'Label31
         '
         Me.Label31.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label31.Location = New System.Drawing.Point(8, 357)
+        Me.Label31.Location = New System.Drawing.Point(8, 371)
         Me.Label31.Name = "Label31"
         Me.Label31.Size = New System.Drawing.Size(160, 20)
         Me.Label31.TabIndex = 294
@@ -299,7 +304,7 @@ Partial Class Dyno
         'Label19
         '
         Me.Label19.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label19.Location = New System.Drawing.Point(8, 187)
+        Me.Label19.Location = New System.Drawing.Point(8, 201)
         Me.Label19.Name = "Label19"
         Me.Label19.Size = New System.Drawing.Size(160, 20)
         Me.Label19.TabIndex = 286
@@ -309,7 +314,7 @@ Partial Class Dyno
         'Label32
         '
         Me.Label32.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label32.Location = New System.Drawing.Point(8, 333)
+        Me.Label32.Location = New System.Drawing.Point(8, 347)
         Me.Label32.Name = "Label32"
         Me.Label32.Size = New System.Drawing.Size(160, 20)
         Me.Label32.TabIndex = 293
@@ -320,7 +325,7 @@ Partial Class Dyno
         '
         Me.txtRollerWallThickness.CausesValidation = False
         Me.txtRollerWallThickness.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtRollerWallThickness.Location = New System.Drawing.Point(176, 211)
+        Me.txtRollerWallThickness.Location = New System.Drawing.Point(176, 225)
         Me.txtRollerWallThickness.Name = "txtRollerWallThickness"
         Me.txtRollerWallThickness.Size = New System.Drawing.Size(72, 22)
         Me.txtRollerWallThickness.TabIndex = 277
@@ -331,7 +336,7 @@ Partial Class Dyno
         'Label33
         '
         Me.Label33.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label33.Location = New System.Drawing.Point(8, 381)
+        Me.Label33.Location = New System.Drawing.Point(8, 395)
         Me.Label33.Name = "Label33"
         Me.Label33.Size = New System.Drawing.Size(160, 20)
         Me.Label33.TabIndex = 295
@@ -341,7 +346,7 @@ Partial Class Dyno
         'Label21
         '
         Me.Label21.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label21.Location = New System.Drawing.Point(8, 211)
+        Me.Label21.Location = New System.Drawing.Point(8, 225)
         Me.Label21.Name = "Label21"
         Me.Label21.Size = New System.Drawing.Size(160, 20)
         Me.Label21.TabIndex = 287
@@ -352,7 +357,7 @@ Partial Class Dyno
         '
         Me.txtExtraDiameter.CausesValidation = False
         Me.txtExtraDiameter.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtExtraDiameter.Location = New System.Drawing.Point(176, 331)
+        Me.txtExtraDiameter.Location = New System.Drawing.Point(176, 345)
         Me.txtExtraDiameter.Name = "txtExtraDiameter"
         Me.txtExtraDiameter.Size = New System.Drawing.Size(72, 22)
         Me.txtExtraDiameter.TabIndex = 282
@@ -364,7 +369,7 @@ Partial Class Dyno
         '
         Me.txtRollerMass.CausesValidation = False
         Me.txtRollerMass.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtRollerMass.Location = New System.Drawing.Point(176, 235)
+        Me.txtRollerMass.Location = New System.Drawing.Point(176, 249)
         Me.txtRollerMass.Name = "txtRollerMass"
         Me.txtRollerMass.Size = New System.Drawing.Size(72, 22)
         Me.txtRollerMass.TabIndex = 278
@@ -376,7 +381,7 @@ Partial Class Dyno
         '
         Me.txtEndCapMass.CausesValidation = False
         Me.txtEndCapMass.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtEndCapMass.Location = New System.Drawing.Point(176, 307)
+        Me.txtEndCapMass.Location = New System.Drawing.Point(176, 321)
         Me.txtEndCapMass.Name = "txtEndCapMass"
         Me.txtEndCapMass.Size = New System.Drawing.Size(72, 22)
         Me.txtEndCapMass.TabIndex = 281
@@ -387,7 +392,7 @@ Partial Class Dyno
         'Label15
         '
         Me.Label15.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label15.Location = New System.Drawing.Point(8, 283)
+        Me.Label15.Location = New System.Drawing.Point(8, 297)
         Me.Label15.Name = "Label15"
         Me.Label15.Size = New System.Drawing.Size(160, 20)
         Me.Label15.TabIndex = 291
@@ -398,7 +403,7 @@ Partial Class Dyno
         '
         Me.txtAxleMass.CausesValidation = False
         Me.txtAxleMass.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtAxleMass.Location = New System.Drawing.Point(176, 283)
+        Me.txtAxleMass.Location = New System.Drawing.Point(176, 297)
         Me.txtAxleMass.Name = "txtAxleMass"
         Me.txtAxleMass.Size = New System.Drawing.Size(72, 22)
         Me.txtAxleMass.TabIndex = 280
@@ -409,7 +414,7 @@ Partial Class Dyno
         'Label27
         '
         Me.Label27.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label27.Location = New System.Drawing.Point(8, 259)
+        Me.Label27.Location = New System.Drawing.Point(8, 273)
         Me.Label27.Name = "Label27"
         Me.Label27.Size = New System.Drawing.Size(160, 20)
         Me.Label27.TabIndex = 290
@@ -419,7 +424,7 @@ Partial Class Dyno
         'Label28
         '
         Me.Label28.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label28.Location = New System.Drawing.Point(8, 307)
+        Me.Label28.Location = New System.Drawing.Point(8, 321)
         Me.Label28.Name = "Label28"
         Me.Label28.Size = New System.Drawing.Size(160, 20)
         Me.Label28.TabIndex = 292
@@ -430,7 +435,7 @@ Partial Class Dyno
         '
         Me.txtAxleDiameter.CausesValidation = False
         Me.txtAxleDiameter.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtAxleDiameter.Location = New System.Drawing.Point(176, 259)
+        Me.txtAxleDiameter.Location = New System.Drawing.Point(176, 273)
         Me.txtAxleDiameter.Name = "txtAxleDiameter"
         Me.txtAxleDiameter.Size = New System.Drawing.Size(72, 22)
         Me.txtAxleDiameter.TabIndex = 279
@@ -451,7 +456,7 @@ Partial Class Dyno
         'lblTargetRollerMass
         '
         Me.lblTargetRollerMass.Font = New System.Drawing.Font("Tahoma", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblTargetRollerMass.Location = New System.Drawing.Point(8, 521)
+        Me.lblTargetRollerMass.Location = New System.Drawing.Point(8, 558)
         Me.lblTargetRollerMass.Name = "lblTargetRollerMass"
         Me.lblTargetRollerMass.Size = New System.Drawing.Size(241, 25)
         Me.lblTargetRollerMass.TabIndex = 302
@@ -461,7 +466,7 @@ Partial Class Dyno
         'lblActualMomentOfInertia
         '
         Me.lblActualMomentOfInertia.Font = New System.Drawing.Font("Tahoma", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblActualMomentOfInertia.Location = New System.Drawing.Point(8, 472)
+        Me.lblActualMomentOfInertia.Location = New System.Drawing.Point(8, 509)
         Me.lblActualMomentOfInertia.Name = "lblActualMomentOfInertia"
         Me.lblActualMomentOfInertia.Size = New System.Drawing.Size(241, 24)
         Me.lblActualMomentOfInertia.TabIndex = 301
@@ -471,7 +476,7 @@ Partial Class Dyno
         'lblTargetMomentOfInertia
         '
         Me.lblTargetMomentOfInertia.Font = New System.Drawing.Font("Tahoma", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblTargetMomentOfInertia.Location = New System.Drawing.Point(8, 496)
+        Me.lblTargetMomentOfInertia.Location = New System.Drawing.Point(8, 533)
         Me.lblTargetMomentOfInertia.Name = "lblTargetMomentOfInertia"
         Me.lblTargetMomentOfInertia.Size = New System.Drawing.Size(241, 25)
         Me.lblTargetMomentOfInertia.TabIndex = 300
@@ -490,18 +495,77 @@ Partial Class Dyno
         'Label1
         '
         Me.Label1.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(89, 452)
+        Me.Label1.Location = New System.Drawing.Point(89, 489)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(160, 20)
         Me.Label1.TabIndex = 304
         Me.Label1.Text = "Moment of Inertia (MOI)"
         Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
+        'RPM1RPM2TextBox
+        '
+        Me.RPM1RPM2TextBox.CausesValidation = False
+        Me.RPM1RPM2TextBox.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.RPM1RPM2TextBox.Location = New System.Drawing.Point(184, 145)
+        Me.RPM1RPM2TextBox.Name = "RPM1RPM2TextBox"
+        Me.RPM1RPM2TextBox.Size = New System.Drawing.Size(64, 22)
+        Me.RPM1RPM2TextBox.TabIndex = 305
+        Me.RPM1RPM2TextBox.Tag = ""
+        Me.RPM1RPM2TextBox.Text = "1"
+        Me.RPM1RPM2TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'RPM1RPM2RatioCheckBox
+        '
+        Me.RPM1RPM2RatioCheckBox.AutoSize = True
+        Me.RPM1RPM2RatioCheckBox.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.RPM1RPM2RatioCheckBox.Location = New System.Drawing.Point(4, 148)
+        Me.RPM1RPM2RatioCheckBox.Name = "RPM1RPM2RatioCheckBox"
+        Me.RPM1RPM2RatioCheckBox.Size = New System.Drawing.Size(174, 18)
+        Me.RPM1RPM2RatioCheckBox.TabIndex = 306
+        Me.RPM1RPM2RatioCheckBox.Text = "MotorRPM / RollerRPM ratio"
+        Me.RPM1RPM2RatioCheckBox.UseVisualStyleBackColor = True
+        '
+        'RawMOITextBox
+        '
+        Me.RawMOITextBox.CausesValidation = False
+        Me.RawMOITextBox.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.RawMOITextBox.Location = New System.Drawing.Point(176, 465)
+        Me.RawMOITextBox.Name = "RawMOITextBox"
+        Me.RawMOITextBox.Size = New System.Drawing.Size(72, 22)
+        Me.RawMOITextBox.TabIndex = 307
+        Me.RawMOITextBox.Tag = ""
+        Me.RawMOITextBox.Text = "0"
+        Me.RawMOITextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'DirectMOICheckBox
+        '
+        Me.DirectMOICheckBox.AutoSize = True
+        Me.DirectMOICheckBox.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.DirectMOICheckBox.Location = New System.Drawing.Point(7, 467)
+        Me.DirectMOICheckBox.Name = "DirectMOICheckBox"
+        Me.DirectMOICheckBox.Size = New System.Drawing.Size(166, 18)
+        Me.DirectMOICheckBox.TabIndex = 308
+        Me.DirectMOICheckBox.Text = "Input raw MOI (kg*m^2)"
+        Me.DirectMOICheckBox.UseVisualStyleBackColor = True
+        '
+        'FakeFocusTextBox
+        '
+        Me.FakeFocusTextBox.Location = New System.Drawing.Point(876, 558)
+        Me.FakeFocusTextBox.Name = "FakeFocusTextBox"
+        Me.FakeFocusTextBox.Size = New System.Drawing.Size(56, 20)
+        Me.FakeFocusTextBox.TabIndex = 309
+        Me.FakeFocusTextBox.Visible = False
+        '
         'Dyno
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(944, 555)
+        Me.ClientSize = New System.Drawing.Size(944, 587)
+        Me.Controls.Add(Me.FakeFocusTextBox)
+        Me.Controls.Add(Me.DirectMOICheckBox)
+        Me.Controls.Add(Me.RawMOITextBox)
+        Me.Controls.Add(Me.RPM1RPM2RatioCheckBox)
+        Me.Controls.Add(Me.RPM1RPM2TextBox)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.lblDynoSettings)
         Me.Controls.Add(Me.lblTargetRollerMass)
@@ -593,4 +657,9 @@ Partial Class Dyno
     Friend WithEvents lblTargetMomentOfInertia As System.Windows.Forms.Label
     Friend WithEvents lblDynoSettings As System.Windows.Forms.Label
     Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents RPM1RPM2TextBox As System.Windows.Forms.TextBox
+    Friend WithEvents RPM1RPM2RatioCheckBox As System.Windows.Forms.CheckBox
+    Friend WithEvents RawMOITextBox As System.Windows.Forms.TextBox
+    Friend WithEvents DirectMOICheckBox As System.Windows.Forms.CheckBox
+    Friend WithEvents FakeFocusTextBox As System.Windows.Forms.TextBox
 End Class

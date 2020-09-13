@@ -16,6 +16,8 @@ Public Class Dyno
     Friend ExtraDiameter As Double
     Friend ExtraWallThickness As Double
     Friend ExtraMass As Double
+    Friend RPM1RPM2Ratio As Double
+    Friend RawMOI As Double
 
     'Dyno Calculations
     Friend IdealMomentOfInertia As Double
@@ -27,11 +29,17 @@ Public Class Dyno
         txtCarMass.Select()
     End Sub
     Private Sub Dyno_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        ' Force utilization of the latest input values by tricking any current textbox execute its Leave event
+        FakeFocusTextBox.Visible = True
+        FakeFocusTextBox.Focus()
+        FakeFocusTextBox.Visible = False
+        UpdateMomentOfInertias()
+
         'Prevents form from actually closing, rather it hides
         If e.CloseReason <> CloseReason.FormOwnerClosing Then
             Me.Hide()
             e.Cancel = True
-            Main.btnShow_click(Me, System.EventArgs.Empty)
+            Main.btnShow_Click(Me, System.EventArgs.Empty)
         End If
     End Sub
     Private Sub txtCarMass_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtCarMass.Enter
@@ -385,6 +393,48 @@ Public Class Dyno
             End With
         End If
     End Sub
+    Private Sub RPM1RPM2TextBox_Leave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RPM1RPM2TextBox.Leave
+        Dim LocalMin As Double = 0
+        Dim LocalMax As Double = 999
+        If Double.TryParse(CType(sender, TextBox).Text, TempDouble) AndAlso Main.CheckNumericalLimits(LocalMin, LocalMax, TempDouble) Then
+            RPM1RPM2Ratio = TempDouble
+            UpdateMomentOfInertias()
+        Else
+            MsgBox(CType(sender, TextBox).Name & " : Value must be between " & LocalMin & " and " & LocalMax, MsgBoxStyle.Exclamation)
+            With CType(sender, TextBox)
+                .Text = RPM1RPM2Ratio.ToString
+                .Focus()
+            End With
+        End If
+    End Sub
+    Private Sub RawMOITextBox_Leave(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RawMOITextBox.Leave
+        Dim LocalMin As Double = 0
+        Dim LocalMax As Double = 999
+        If Double.TryParse(CType(sender, TextBox).Text, TempDouble) AndAlso Main.CheckNumericalLimits(LocalMin, LocalMax, TempDouble) Then
+            RawMOI = TempDouble
+            UpdateMomentOfInertias()
+        Else
+            MsgBox(CType(sender, TextBox).Name & " : Value must be between " & LocalMin & " and " & LocalMax, MsgBoxStyle.Exclamation)
+            With CType(sender, TextBox)
+                .Text = RawMOI.ToString
+                .Focus()
+            End With
+        End If
+    End Sub
+    Private Sub RPM1RPM2TextBox_Enter(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RPM1RPM2TextBox.Enter
+        picDynoSettings.BackgroundImage = My.Resources.GearRatio
+        lblDynoSettings.Text = _
+            "Enter the end-to-end ratio for your drivetrain.  This value has NO impact on the magnitude of the dyno results.  " & _
+            "This number is used to back calculate the RPM of the motor from the RPM of the rollers. " & _
+            "It can be measured e.g. by keeping constant 2000RPM on engine and measuring actual roller RPM achieved. " & _
+            "This value is typically greater than 1."
+    End Sub
+    Private Sub RawMOITextBox_Enter(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RawMOITextBox.Enter
+        picDynoSettings.BackgroundImage = My.Resources.RollerMass
+        lblDynoSettings.Text = _
+            "Enter the roller raw (measured) inertia if you know it. This value is CRITICAL for accurate dyno results.  " & _
+            "This value impacts the torque and power results.  "
+    End Sub
     Friend Sub UpdateMomentOfInertias()
         Dim RollerMomentOfInertia As Double
         Dim AxleMomentOfInertia As Double
@@ -415,7 +465,12 @@ Public Class Dyno
         r2 = (ExtraDiameter / 2.0 - ExtraWallThickness) / 1000.0
         ExtraMomentOfInertia = 1 / 2 * m * (r1 ^ 2 + r2 ^ 2)
         'Total
-        Main.DynoMomentOfInertia = RollerMomentOfInertia + AxleMomentOfInertia + EndCapMomentOfInertia + ExtraMomentOfInertia
+        If DirectMOICheckBox.Checked Then
+            Main.DynoMomentOfInertia = RawMOI
+        Else
+            Main.DynoMomentOfInertia = RollerMomentOfInertia + AxleMomentOfInertia + EndCapMomentOfInertia + ExtraMomentOfInertia
+        End If
+
         'Ideal Roller Mass
         'Car outputs 1 N force which will give F/m acceleration
         Dim CarAcceleration As Double = 1 / (CarMass / 1000.0) 'm/s^2
@@ -437,7 +492,13 @@ Public Class Dyno
 
         'For Wheel and Motor RPM conversions and speed conversion
         Main.RollerRPMtoWheelRPM = RollerDiameter / WheelDiameter
-        Main.RollerRPMtoMotorRPM = RollerDiameter / WheelDiameter * Main.GearRatio
+
+        If RPM1RPM2RatioCheckBox.Checked Then
+            Main.RollerRPMtoMotorRPM = RPM1RPM2Ratio
+        Else
+            Main.RollerRPMtoMotorRPM = RollerDiameter / WheelDiameter * Main.GearRatio
+        End If
+
         Main.RollerRadsPerSecToMetersPerSec = (RollerCircumference / 1000) / (2 * Math.PI)
 
         If Main.DynoMomentOfInertia >= 0.0009 Then
