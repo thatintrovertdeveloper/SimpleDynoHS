@@ -3744,7 +3744,7 @@ Public Class Main
                         'Sleep according to simulated arduino timestamps 
                         COMPortMessage = Split(line, ",")
                         Dim currentTimestamp As Long = CInt(COMPortMessage(0))
-                        If previousTimestamp <> 0 Then
+                        If previousTimestamp <> 0 And (currentTimestamp - previousTimestamp) > 0 Then
                             Threading.Thread.Sleep(CInt((currentTimestamp - previousTimestamp) / 1000))
                         End If
                         previousTimestamp = currentTimestamp
