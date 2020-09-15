@@ -3243,7 +3243,7 @@ Public Class Main
 
     Private Sub TogglePowerRun()
         If Me.InvokeRequired Then
-            Me.Invoke(New Action(AddressOf TogglePowerRun))
+            Me.BeginInvoke(New Action(AddressOf TogglePowerRun))
         Else
             Try
                 'Regardless of why we clicked it, the radio button for rpm on the fit form should be set for RPM
