@@ -2727,7 +2727,7 @@ Public Class Main
         Dim filePathProto As String = ""
 
         For index As Integer = 1 To 999
-            postfixProto = "_" & index.ToString & ".sds"
+            postfixProto = "_" & index.ToString & ".sdp"
             filePathProto = txtPowerrunDir.Text & "\" & SessionTextBox.Text & postfixProto
             If Not System.IO.File.Exists(filePathProto) Then
                 Exit For

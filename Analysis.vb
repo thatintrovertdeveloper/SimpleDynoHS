@@ -102,7 +102,7 @@ Public Class Analysis
             Dim TickInterval As Double, TempString As String
 
             'Define the "equal spacing" values - these allow the data to be plotted evenly across so that the line types can be seen clearly
-            Dim EqualSpacingCount As Integer = 50
+            Dim EqualSpacingCount As Integer = 500
             Dim EqualSpacingInterval(MAXDATAFILES) As Double
             Dim EqualSpacingPointers(MAXDATAFILES, EqualSpacingCount) As Double
 
