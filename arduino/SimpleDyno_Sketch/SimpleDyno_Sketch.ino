@@ -181,6 +181,7 @@ void loop() {
     AllResult += AnalogResult[Looper];
   }
 
+  Serial.println (AllResult);
   Serial.flush();
   delay(1);
 }
