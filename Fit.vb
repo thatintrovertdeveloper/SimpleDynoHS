@@ -49,6 +49,8 @@ Public Class Fit
     Private FitData(Main.LAST, Main.MAXDATAPOINTS) As Double 'CHECK adding one additional primary dimension to hold residuals
     Private inputfile As StreamReader
     Private inputdialog As New OpenFileDialog
+    Private interruptAutoClose As Boolean = True
+
     Friend Sub Fit_Setup()
         cmbWhichFit.Items.AddRange(AvailableFits)
         cmbWhichFit.SelectedIndex = 1 'Second Order - fastest initial
@@ -393,6 +395,21 @@ Public Class Fit
 
                 rdoRPM1.Checked = True
                 rdoRPM1_CheckedChanged(Me, EventArgs.Empty)
+
+                Application.DoEvents()
+                Dim originalTitle As String = Me.Text
+                interruptAutoClose = False
+                For t = 0 To 50
+                    Me.Text = originalTitle & " - Auto-exiting in " & CInt((50 - t) / 10).ToString() & " seconds.. Interrupt by moving the mouse"
+                    Threading.Thread.Sleep(100)
+                    Application.DoEvents()
+                    If interruptAutoClose Then Exit For
+                Next
+                Me.Text = originalTitle
+
+                If Not interruptAutoClose Then
+                    btnDone_Click(Nothing, Nothing)
+                End If
 
             End If
             Main.RestartForms()
@@ -1555,13 +1572,15 @@ Public Class Fit
         'If blnfit Then
         If blnRPMFit AndAlso blnCoastDownDownFit AndAlso blnVoltageFit AndAlso blnCurrentFit Then
             WritePowerFile()
-            If chkAddOrNew.Checked = False Then
-                Main.frmAnalysis.btnClearOverlay_Click_1(Me, System.EventArgs.Empty)
+            If interruptAutoClose Then
+                If chkAddOrNew.Checked = False Then
+                    Main.frmAnalysis.btnClearOverlay_Click_1(Me, System.EventArgs.Empty)
+                End If
+                Main.frmAnalysis.WindowState = FormWindowState.Normal
+                Main.frmAnalysis.OpenFileDialog1.FileName = Main.LogPowerRunDataFileName
+                Main.frmAnalysis.btnAddOverlayFile_Click_1(Me, System.EventArgs.Empty)
+                Main.frmAnalysis.ShowDialog()
             End If
-            Main.frmAnalysis.WindowState = FormWindowState.Normal
-            Main.frmAnalysis.OpenFileDialog1.FileName = Main.LogPowerRunDataFileName
-            Main.frmAnalysis.btnAddOverlayFile_Click_1(Me, System.EventArgs.Empty)
-            Main.frmAnalysis.ShowDialog()
         Else
             'Main.StopFitting = True
             MsgBox("All of the expected curve fits were not completed. Please make sure all data are fit appropriately", vbOKOnly)
@@ -1577,4 +1596,11 @@ Public Class Fit
         Main.Cursor = Cursors.Default
     End Sub
 
+    Private Sub Fit_MouseMove(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles MyBase.MouseMove
+        interruptAutoClose = True
+    End Sub
+
+    Private Sub pnlDataWindow_MouseMove(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles pnlDataWindow.MouseMove
+        interruptAutoClose = True
+    End Sub
 End Class
