@@ -49,7 +49,8 @@ Public Class Fit
     Private FitData(Main.LAST, Main.MAXDATAPOINTS) As Double 'CHECK adding one additional primary dimension to hold residuals
     Private inputfile As StreamReader
     Private inputdialog As New OpenFileDialog
-    Private interruptAutoClose As Boolean = True
+    Private interruptAutoCloseEventCounter As Integer = 0
+    Private Const EVENTS_TO_INTERRUPT_AUTOCLOSE As Integer = 100
 
     Friend Sub Fit_Setup()
         cmbWhichFit.Items.AddRange(AvailableFits)
@@ -398,16 +399,16 @@ Public Class Fit
 
                 Application.DoEvents()
                 Dim originalTitle As String = Me.Text
-                interruptAutoClose = False
+                interruptAutoCloseEventCounter = 0
                 For t = 0 To 50
                     Me.Text = originalTitle & " - Auto-exiting in " & CInt((50 - t) / 10).ToString() & " seconds.. Interrupt by moving the mouse"
                     Threading.Thread.Sleep(100)
                     Application.DoEvents()
-                    If interruptAutoClose Then Exit For
+                    If interruptAutoCloseEventCounter > EVENTS_TO_INTERRUPT_AUTOCLOSE Then Exit For
                 Next
                 Me.Text = originalTitle
 
-                If Not interruptAutoClose Then
+                If interruptAutoCloseEventCounter <= EVENTS_TO_INTERRUPT_AUTOCLOSE Then
                     btnDone_Click(Nothing, Nothing)
                 End If
 
@@ -1572,7 +1573,7 @@ Public Class Fit
         'If blnfit Then
         If blnRPMFit AndAlso blnCoastDownDownFit AndAlso blnVoltageFit AndAlso blnCurrentFit Then
             WritePowerFile()
-            If interruptAutoClose Then
+            If interruptAutoCloseEventCounter > EVENTS_TO_INTERRUPT_AUTOCLOSE Then
                 If chkAddOrNew.Checked = False Then
                     Main.frmAnalysis.btnClearOverlay_Click_1(Me, System.EventArgs.Empty)
                 End If
@@ -1597,10 +1598,10 @@ Public Class Fit
     End Sub
 
     Private Sub Fit_MouseMove(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles MyBase.MouseMove
-        interruptAutoClose = True
+        interruptAutoCloseEventCounter = interruptAutoCloseEventCounter + 1
     End Sub
 
     Private Sub pnlDataWindow_MouseMove(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles pnlDataWindow.MouseMove
-        interruptAutoClose = True
+        interruptAutoCloseEventCounter = interruptAutoCloseEventCounter + 1
     End Sub
 End Class

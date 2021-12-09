@@ -2880,6 +2880,7 @@ Public Class Main
             SDFrm.CreateTheMenu()
         Next
         RestartForms()
+        triggerSimulationIfAvailable = True
     End Sub
     Private ClosingCOMPort As Boolean = False
     Private Sub GetAvailableCOMPorts()
@@ -3184,7 +3185,7 @@ Public Class Main
 
                     End SyncLock
 
-                    DoPowerRunSerialControl(CDbl(COMPortMessage(10)))
+                    DoPowerRunSerialControl(A5ValueIntercept + A5ValueSlope * CDbl(COMPortMessage(10)), COMPortMessage)
 
                     SetControlText_Threadsafe(frmCOM.lblCurrentVolts, NewCustomFormat(Data(VOLTS, ACTUAL)))
                     SetControlText_Threadsafe(frmCOM.lblCurrentAmps, NewCustomFormat(Data(AMPS, ACTUAL)))
@@ -3220,24 +3221,35 @@ Public Class Main
     End Sub
 
     ' Serial port triggered events for the power run state
-    Private Sub DoPowerRunSerialControl(ByVal A5RawValue As Double)
+    Private Sub DoPowerRunSerialControl(ByVal A5Value As Double, ByVal message() As String)
         Static A5PrevState As Boolean = False
+        Static A5FirstFalseDetected As Boolean = False
+        Static bouncePreventTimer As Stopwatch = Stopwatch.StartNew()
         If A5PowerRunControl Then
-            Dim A5Threshold As Double = (A5Voltage2 - A5Voltage1) / 2
-            Dim A5State As Boolean = A5RawValue > A5Threshold
+            Dim A5Threshold As Double = A5ValueIntercept + (A5Value2 - A5Value1) / 2
+            Dim A5State As Boolean = A5Value > A5Threshold
 
-            ' Only trigger from A5 changes so that autostop due to roller stop is possible even when A5 remains up
-            If WhichDataMode = POWERRUN And A5PrevState And Not A5State Then
-                TogglePowerRun()
-            ElseIf WhichDataMode <> POWERRUN And A5State And Not A5PrevState Then
+            If Not A5FirstFalseDetected And Not A5State Then
+                A5FirstFalseDetected = True
+            End If
+
+            ' Wait for A5 control to be off before considering its value
+            If bouncePreventTimer.ElapsedMilliseconds > 1000 And A5FirstFalseDetected Then
+                ' Only trigger from A5 changes so that autostop due to roller stop is possible even when A5 remains up
+                If WhichDataMode = POWERRUN And A5PrevState And Not A5State Then
+                    TogglePowerRun()
+                    bouncePreventTimer = Stopwatch.StartNew()
+                ElseIf WhichDataMode <> POWERRUN And A5State And Not A5PrevState Then
+                    TogglePowerRun()
+                    bouncePreventTimer = Stopwatch.StartNew()
+                End If
+                A5PrevState = A5State
+            End If
+
+            ' Manually started powerrun automatically stops when roller RPM fall to zero
+            If WhichDataMode = POWERRUN AndAlso DataPoints > MinimumPowerRunPoints AndAlso Data(RPM1_ROLLER, ACTUAL) <= ActualPowerRunThreshold Then
                 TogglePowerRun()
             End If
-            A5PrevState = A5State
-        End If
-
-        ' Manually started powerrun automatically stops when roller RPM fall to zero
-        If WhichDataMode = POWERRUN AndAlso DataPoints > MinimumPowerRunPoints AndAlso Data(RPM1_ROLLER, ACTUAL) <= ActualPowerRunThreshold Then
-            TogglePowerRun()
         End If
     End Sub
 
@@ -3711,6 +3723,7 @@ Public Class Main
 #End If
 #End Region
 #Region "Simulation"
+    Private triggerSimulationIfAvailable As Boolean = False
     ' Thread function for running the simulated serial data
     Private Sub serialSimuFunc()
         Dim dirOfExecutable As String = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase)
@@ -3719,20 +3732,20 @@ Public Class Main
         Dim fileReader As System.IO.StreamReader = Nothing
 
         Dim line As String
-        Dim wasPowerRun As Boolean = False
+        Dim wasTriggered As Boolean = False
         Dim previousTimestamp As Long = 0
 
         While True
-            If WhichDataMode = POWERRUN Then
+            If triggerSimulationIfAvailable Then
 
                 ' Open the file when entering powerrun
-                If Not wasPowerRun Then
+                If Not wasTriggered Then
                     Try
                         fileReader = My.Computer.FileSystem.OpenTextFileReader(simuFilePath)
                     Catch e1 As Exception
                         'Nothing to do
                     End Try
-                    wasPowerRun = True
+                    wasTriggered = True
                 End If
 
                 If Not IsNothing(fileReader) Then
@@ -3740,6 +3753,7 @@ Public Class Main
                     If IsNothing(line) Then
                         fileReader.Close()
                         fileReader = Nothing
+                        triggerSimulationIfAvailable = False
                     Else
                         'Sleep according to simulated arduino timestamps 
                         COMPortMessage = Split(line, ",")
@@ -3754,7 +3768,7 @@ Public Class Main
                     Threading.Thread.Sleep(500)
                 End If
             Else
-                wasPowerRun = False
+                wasTriggered = False
                 Threading.Thread.Sleep(500)
             End If
 
