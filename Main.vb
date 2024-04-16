@@ -1096,7 +1096,8 @@ Public Class Main
         'Open Up the default interface
         LoadInterface()
 
-        serialSimuThread.Start()
+        'Uncomment to enable serial simulation
+        'serialSimuThread.Start()
     End Sub
     Private Sub Form1_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         Formloaded = True
