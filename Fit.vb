@@ -3,7 +3,7 @@ Public Class Fit
     'CHECK - This needs to be reset to 0 for release versions
 #Const LoadOldPowerRunData = 0
 
-    Private AvailableFits As String() = {"Four Parameter", "2nd Order Poly", "3rd Order Poly", "4th Order Poly", "5th Order Poly", "MA Smooth"} ' "Test"} ', "Simple Smoothing"}
+    Private AvailableFits As String() = {"Four Parameter", "2nd Order Poly", "3rd Order Poly", "4th Order Poly", "5th Order Poly", "MA Smooth", "None"} ' "Test"} ', "Simple Smoothing"}
     Private FitStartPoint As Integer = 1
     Private CurrentSmooth As Double
     Private VoltageSmooth As Double
@@ -50,7 +50,7 @@ Public Class Fit
     Private inputfile As StreamReader
     Private inputdialog As New OpenFileDialog
     Private interruptAutoCloseEventCounter As Integer = 0
-    Private Const EVENTS_TO_INTERRUPT_AUTOCLOSE As Integer = 100
+    Private Const EVENTS_TO_INTERRUPT_AUTOCLOSE As Integer = 50
 
     Friend Sub Fit_Setup()
         cmbWhichFit.Items.AddRange(AvailableFits)
@@ -1025,6 +1025,12 @@ Public Class Fit
             End If
         Next t
     End Sub
+    Sub NoSmooth(ByRef SentY() As Double, ByRef SentFY() As Double)
+        Dim t As Long
+        For t = 0 To UBound(SentY)  'top to bottom of data
+            SentFY(CInt(t)) = SentY(CInt(t))
+        Next t
+    End Sub
     Sub NonLin_fitting(ByRef SentX() As Double, ByRef SentY() As Double, ByRef SentFY() As Double, ByVal SentCurveChoice As Integer, ByRef blnFitFinished As Boolean)
 
         Dim ParameterSetSize As Integer, NewC As Double
@@ -1086,6 +1092,17 @@ Public Class Fit
                     lblProgress.Text = "Smoothing Coast Down..."
                     CoastDownSmooth = (scrlCoastDownSmooth.Maximum + 1 - scrlCoastDownSmooth.Value) / 2
                     MovingAverageSmooth(SentY, SentFY, CoastDownSmooth)
+                    blnfit = True
+                    blnFitFinished = True
+                End If
+            Case Is = 7 ' No smoothing
+                If rdoRPM1.Checked Then
+                    NoSmooth(SentY, SentFY)
+                    blnfit = True
+                    blnFitFinished = True
+                End If
+                If rdoRunDown.Checked Then
+                    NoSmooth(SentY, SentFY)
                     blnfit = True
                     blnFitFinished = True
                 End If
