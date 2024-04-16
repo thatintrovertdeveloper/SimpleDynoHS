@@ -204,7 +204,7 @@ Public Class Main
 #End Region
 #Region "SimpleDyno Definitions "
     'Version Strings
-    Public Shared MainTitle As String = "SimpleDyno " & SDVersion & " by DamoRC"
+    Public Shared MainTitle As String = "SimpleDyno HS " & SDVersion & " by DamoRC / LNi / JAh"
     Public Shared PowerRunVersion As String = "POWER_RUN_" & SDVersion
     Public Shared LogRawVersion As String = "LOG_RAW_" & SDVersion
     Public Shared InterfaceVersion As String = "SimpleDyno_Interface_" & SDVersion
