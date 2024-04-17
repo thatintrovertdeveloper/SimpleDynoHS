@@ -3,7 +3,7 @@ Public Class Fit
     'CHECK - This needs to be reset to 0 for release versions
 #Const LoadOldPowerRunData = 0
 
-    Private AvailableFits As String() = {"Four Parameter", "2nd Order Poly", "3rd Order Poly", "4th Order Poly", "5th Order Poly", "MA Smooth", "None"} ' "Test"} ', "Simple Smoothing"}
+    Private AvailableFits As String() = {"Four Parameter", "2nd Order Poly", "3rd Order Poly", "4th Order Poly", "5th Order Poly", "MA Smooth", "MLSQ Linfit", "None"} ' "Test"} ', "Simple Smoothing"}
     Private FitStartPoint As Integer = 1
     Private CurrentSmooth As Double
     Private VoltageSmooth As Double
@@ -1025,6 +1025,42 @@ Public Class Fit
             End If
         Next t
     End Sub
+    Sub MovingLSQLinfitSmooth(ByRef SentX() As Double, ByRef SentY() As Double, ByRef SentFY() As Double, ByVal WindowPercent As Double)
+        Dim n As Long, w As Integer, t As Long, s As Long
+        Dim SumXY As Double, SumX As Double, SumY As Double, SumXsq As Double
+        Dim k As Double, b As Double
+        Dim m As Long
+
+        n = 0 'reset window width
+        w = CInt(Int(UBound(SentY) / 100 * WindowPercent))
+        For t = 1 To UBound(SentY)  'top to bottom of data
+            prgFit.Value = CInt(prgFit.Maximum / UBound(SentY) * t)
+            SumX = 0
+            SumY = 0
+            SumXY = 0
+            SumXsq = 0
+            For s = t - n To t + n
+                SumX += SentX(CInt(s))
+                SumY += SentY(CInt(s))
+                SumXY += SentX(CInt(s)) * SentY(CInt(s))
+                SumXsq += SentX(CInt(s)) * SentX(CInt(s))
+            Next s
+            m = n * 2 + 1
+            If m > 1 Then
+                k = (m * SumXY - SumX * SumY) / (m * SumXsq - SumX * SumX)
+                b = (SumY * SumXsq - SumX * SumXY) / (m * SumXsq - SumX * SumX)
+                SentFY(CInt(t)) = k * SentX(CInt(t)) + b
+            Else
+                SentFY(CInt(t)) = SentY(CInt(t))
+            End If
+            If n <> w And UBound(SentY) - t > w Then
+                n = n + 1
+            ElseIf UBound(SentY) - t <= w Then
+                n = n - 1
+            End If
+        Next t
+    End Sub
+
     Sub NoSmooth(ByRef SentY() As Double, ByRef SentFY() As Double)
         Dim t As Long
         For t = 0 To UBound(SentY)  'top to bottom of data
@@ -1095,7 +1131,22 @@ Public Class Fit
                     blnfit = True
                     blnFitFinished = True
                 End If
-            Case Is = 7 ' No smoothing
+            Case Is = 7 ' Moving least squares linfit
+                If rdoRPM1.Checked Then
+                    lblProgress.Text = "Smoothing RPM1..."
+                    RPM1Smooth = (scrlRPM1Smooth.Maximum + 1 - scrlRPM1Smooth.Value) / 2
+                    MovingLSQLinfitSmooth(SentX, SentY, SentFY, RPM1Smooth)
+                    blnfit = True
+                    blnFitFinished = True
+                End If
+                If rdoRunDown.Checked Then
+                    lblProgress.Text = "Smoothing Coast Down..."
+                    CoastDownSmooth = (scrlCoastDownSmooth.Maximum + 1 - scrlCoastDownSmooth.Value) / 2
+                    MovingLSQLinfitSmooth(SentX, SentY, SentFY, RPM1Smooth)
+                    blnfit = True
+                    blnFitFinished = True
+                End If
+            Case Is = 8 ' No smoothing
                 If rdoRPM1.Checked Then
                     NoSmooth(SentY, SentFY)
                     blnfit = True
@@ -1521,7 +1572,7 @@ Public Class Fit
     Private Sub rdoRunDown_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoRunDown.CheckedChanged
         If rdoRunDown.Checked Then
             cmbWhichRDFit.Enabled = True
-            If cmbWhichRDFit.SelectedItem.ToString = "MA Smooth" Then
+            If cmbWhichRDFit.SelectedItem.ToString = "MA Smooth" Or cmbWhichRDFit.SelectedItem.ToString = "MLSQ Linfit" Then
                 scrlCoastDownSmooth.Enabled = True
             Else
                 scrlCoastDownSmooth.Enabled = False
@@ -1556,7 +1607,7 @@ Public Class Fit
             If rdoRPM1.Checked = True Then
                 WhichFitData = RPM
                 Main.StopFitting = False
-                If cmbWhichFit.SelectedItem.ToString = "MA Smooth" Then
+                If cmbWhichFit.SelectedItem.ToString = "MA Smooth" Or cmbWhichFit.SelectedItem.ToString = "MLSQ Linfit" Then
                     scrlRPM1Smooth.Enabled = True
                 Else
                     scrlRPM1Smooth.Enabled = False
@@ -1572,7 +1623,7 @@ Public Class Fit
             If rdoRunDown.Checked = True Then
                 WhichFitData = RUNDOWN
                 Main.StopFitting = False
-                If cmbWhichRDFit.SelectedItem.ToString = "MA Smooth" Then
+                If cmbWhichRDFit.SelectedItem.ToString = "MA Smooth" Or cmbWhichRDFit.SelectedItem.ToString = "MLSQ Linfit" Then
                     scrlCoastDownSmooth.Enabled = True
                 Else
                     scrlCoastDownSmooth.Enabled = False
