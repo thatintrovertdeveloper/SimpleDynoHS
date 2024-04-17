@@ -3028,8 +3028,8 @@ Public Class Main
                         If Not WavesStarted Then 'Use COM data for timing and RPM
                             Data(SESSIONTIME, ACTUAL) = CDbl(COMPortMessage(0)) / 1000000 'Increase the session time value - used by the Graphing form for time info
                             ElapsedTime = Data(SESSIONTIME, ACTUAL) - OldSessionTime 'CHECK - Are we actually using this anywhere for com communications?
-                            RPM1NewTriggerTime = CDbl(COMPortMessage(1)) / 1000000 'RPM1
-                            RPM1ElapsedTime = CDbl(COMPortMessage(2)) / 1000000
+                            RPM1ElapsedTime = CDbl(COMPortMessage(2)) / 1000000 'RPM1
+                            RPM1NewTriggerTime = CDbl(COMPortMessage(1)) / 1000000 - (RPM1ElapsedTime / 2) 'Set RPM1 timestamp in the middle of the trigger interval
                             If RPM1NewTriggerTime <> RPM1OldTriggerTime Then 'New trigger detected, go ahead and process RPM relevant info
                                 Data(RPM1_ROLLER, ACTUAL) = ElapsedTimeToRadPerSec / RPM1ElapsedTime
                                 Data(RPM1_WHEEL, ACTUAL) = Data(RPM1_ROLLER, ACTUAL) * RollerRPMtoWheelRPM 'calculate the wheel and motor angular velocities based on roller and wheel diameters and gear ratio
