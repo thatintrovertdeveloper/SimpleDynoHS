@@ -287,6 +287,7 @@ Public Class Main
     Private AcquisitionOptions As String() = {"Audio Only", "Audio & COM Port Sensing", "COM Port Only"}
 
     Public Shared Formloaded As Boolean = False
+    Public Shared RunSimulation As Boolean = False
 
     'Wave Specific
     Public Shared SAMPLE_RATE As Integer
@@ -1097,7 +1098,8 @@ Public Class Main
         LoadInterface()
 
         'Uncomment to enable serial simulation
-        'serialSimuThread.Start()
+        RunSimulation = True
+        serialSimuThread.Start()
     End Sub
     Private Sub Form1_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         Formloaded = True
@@ -1108,6 +1110,8 @@ Public Class Main
         ShutDownWaves()
         myCallBackFunction = Nothing
         SerialClose()
+        RunSimulation = False
+        serialSimuThread.Join()
     End Sub
     Private Sub btnDyno_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDyno.Click
         btnHide_Click(Me, EventArgs.Empty)
@@ -3736,7 +3740,7 @@ Public Class Main
         Dim wasTriggered As Boolean = False
         Dim previousTimestamp As Long = 0
 
-        While True
+        While RunSimulation
             If triggerSimulationIfAvailable Then
 
                 ' Open the file when entering powerrun
