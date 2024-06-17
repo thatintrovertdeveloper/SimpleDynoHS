@@ -319,8 +319,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Test and Release Procedures.txt" />
-    <Content Include="ToDo.txt" />
     <None Include="Resources\Image1.bmp" />
     <Content Include="SD.ico" />
   </ItemGroup>
